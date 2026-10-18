@@ -12,7 +12,7 @@ Prüfungen: 14 Standardtests einschließlich 12 positiver/negativer Schutztests 
 
 Nächster notwendiger Schritt: Mandantentrennung, Rollen und Superadmin-Grundlage vor Landingpage/Partnerregistrierung. Installation und Tests auf Rechner 2 sind noch offen. Details: [Lokale Entwicklung ohne Docker](LOCAL-DEVELOPMENT.md). Der vorherige Docker-Versuch wurde nach Nutzerkorrektur verworfen; keine Container angelegt, keine globale Reparatur und kein Reset. Docker-Dateien aus dem neuen Projekt entfernt.
 
-Git: Erstcommit und Push werden erst nach Abschluss der Dateiprüfung durchgeführt; tatsächliches Ergebnis im abschließenden Arbeitsbericht. Die nachfolgende P-009-Beschreibung ist historisch.
+Git: Erstcommit `6b69c26` erstellt und erfolgreich nach `origin/main` gepusht. Remote-Hash stimmte bei anschließender Prüfung mit lokalem HEAD überein; Arbeitsbaum sauber. Dieser Dokumentationsnachtrag folgt separat. Keine Geheimnisse, lokalen Laufzeiten oder Datenbanken versioniert. Die nachfolgende P-009-Beschreibung ist historisch.
 
 Abschlussprüfung P-010: Docker-freies Einrichtungsskript praktisch erfolgreich erneut ausgeführt; eigene MySQL-Start-/Stop-/Neustartskripte erfolgreich geprüft. Ein erster Shutdown-Versuch per TCP-Rootzugang wurde abgewiesen; ersetzt durch das prozessgeprüfte geordnete MySQL-Windows-Ereignis, ohne Rootrechte für den App-Benutzer. Alle 14 Standardtests und der MySQL-Integrationstest danach erneut grün. Lokale Statusseite gestartet und HTTP 200 geprüft; beide Ports nur auf 127.0.0.1. Keine fachlichen Funktionen als fertig markiert.
 
