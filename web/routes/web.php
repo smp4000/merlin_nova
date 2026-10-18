@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\StationController;
 use App\Http\Middleware\RequireActiveUser;
@@ -9,10 +10,7 @@ use App\Models\PartnerMembership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return response('Merlin Nova – lokale Entwicklungsgrundlage. Partnerregistrierung folgt.', 200)
-        ->header('Content-Type', 'text/plain; charset=UTF-8');
-});
+Route::get('/', LandingController::class)->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::view('/login', 'auth.login')->name('login');

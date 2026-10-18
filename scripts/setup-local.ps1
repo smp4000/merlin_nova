@@ -10,9 +10,10 @@ $runtime = Join-Path $root '.runtime\php'
 if (Test-Path (Join-Path $runtime 'php.exe')) {
     $env:PHPRC = $runtime
     $env:PATH = "$runtime;$env:PATH"
+    $env:PHP_INI_SCAN_DIR = Join-Path $runtime 'nova-empty-scan'
 }
-& php -r 'exit(PHP_VERSION_ID >= 80300 && extension_loaded("pdo_mysql") && extension_loaded("intl") && extension_loaded("zip") ? 0 : 1);'
-if ($LASTEXITCODE -ne 0) { throw 'PHP ab 8.3 mit pdo_mysql, intl und zip erforderlich.' }
+& php -r 'exit(PHP_VERSION_ID >= 80401 && extension_loaded("pdo_mysql") && extension_loaded("intl") && extension_loaded("zip") ? 0 : 1);'
+if ($LASTEXITCODE -ne 0) { throw 'PHP ab 8.4.1 mit pdo_mysql, intl und zip erforderlich.' }
 $rootEnv = Join-Path $root '.env'
 $webEnv = Join-Path $root 'web\.env'
 if ((Test-Path $rootEnv) -xor (Test-Path $webEnv)) {

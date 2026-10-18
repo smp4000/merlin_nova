@@ -2,7 +2,51 @@
 
 Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwechsel.
 
-## Aktueller Arbeitsstand P-012: Tarife und Testverwaltung
+## Aktueller Arbeitsstand P-014: Landingpage nach freigegebenem Mockup
+
+18.10.2026: Lokale Landingpage auf ausdrücklichen Auftrag an die Nutzervorlage angepasst; Rückmeldung „sehr gut“. Türkis/Petrol, dunkelblauer Text, Tankstellenmotiv, Stations-App-Vorschau, dreistufiger Einstieg und kompakte Funktionskarten ersetzen die zuvor zu weit abweichende Gestaltung. Die positive Rückmeldung bestätigt die Designrichtung, nicht eine Produktiv-/Sicherheitsabnahme.
+
+### Umgesetzt und geprüft
+
+- Kopfbereich mit Titel „Ihre Stationen. Ihr Team. Alles im Blick.“, kostenlosem Test und SEPA-/Testhinweis wie in der Vorlage. Breites zweispaltiges Desktoplayout, auf schmalen Ansichten gestapelt.
+- Neues generiertes markenfreies Tankstellenmotiv unter `web/public/images/station-background-v1.png`, ausschließlich lokal ausgeliefert und im Tarifband wiederverwendet. Keine Darstellung eines realen Kundenstandorts; keine extern geladenen Fotos, Schriftarten oder Iconbibliotheken.
+- HTML-App-Vorschau mit Stationsliste, Seitenleiste und Schnellstart. Sichtbar als „App-Vorschau · Beispieldaten“ markiert; ausschließlich feste fiktive Namen/Zahlen, keine Partner-/Personaldatenabfrage und keine scheinbar aktiven App-Bedienelemente. Vorschau für Screenreader als Illustration beschrieben.
+- Schrittfolge Partnerkonto → Stationen → Mitarbeiter sowie Karten „Team & Verträge“, „MHD & Etiketten“, „Kasse & Übergaben“. Noch unfertige Module bleiben als „In Vorbereitung“ gekennzeichnet.
+- Veröffentlichte Tarifversionen, exakte Centpreise, Perioden-/Preisbasen, Stationslimits und aktive Testbedingungen unverändert dynamisch angebunden. Keine Beispielpreise oder Nutzereinstellungen angelegt/verändert.
+- 95 Standardtests mit 278 Assertions grün, zusätzlich echter MySQL-Integrationstest mit 3 Assertions grün. Neues Mockup-Regressionsszenario prüft Kennzeichnung, lokale Assets, Struktur und Designmerkmale; bestehende Entwurfs-/Preiswechsel-/Testregel-/Escaping-Prüfungen bleiben erhalten. Pint und Frontend-Build erfolgreich.
+- Browseransicht im vorhandenen schmalen Seitenpanel visuell geprüft: Motiv, Petrol-Branding, neue Titel, Appvorschau und gestapelte Schritte sichtbar. HTML, CSS und Motiv lokal geprüft. Keine vollständige Desktop-/Geräte-/Accessibility-Abnahme behauptet.
+
+Offen bleibt die echte Partnerregistrierung mit vorbereitendem SEPA, E-Mail-Nachweis und festgeschriebenem Teststart; keine Kostenpflicht oder Abbuchung durch diese Seite. Rechtstexte und Produktivhärtung bleiben eigene Abnahmepunkte. Docker, Livesystem und Altarchiv unverändert.
+
+Nächster Schritt: Partnerregistrierung auf dieser bestätigten Designrichtung aufbauen. Git: Landingpage-Arbeitsstand weiterhin lokal, noch nicht zusätzlich committet/gepusht; letzter gesicherter Stand bleibt `6843792`.
+
+## Vorheriger Arbeitsstand P-013: Landingpage „Klar & ruhig“
+
+18.10.2026: Tarifverwaltung P-012 zuerst nach erneuter grüner Prüfung als `6843792` committet und nach `origin/main` gepusht; Remote-Hash übereinstimmend geprüft. Danach lokale Landingpage umgesetzt. Kein Docker, keine Änderungen am Archiv oder Livesystem.
+
+### Umgesetzt
+
+- Öffentliche Startseite `/` ersetzt die technische Textmeldung: ruhiges Nova-Branding, breites Desktoplayout, gestapelte kleinere Ansichten, klare Navigation, Überblick, kostenloser Test, Tarifkarten und kurze aufklappbare Fragen.
+- Kostenloser Test als Hauptaktion. Dauer und Stationslimit ausschließlich aus den im Superadmin aktivierten Testregeln; ohne Konfiguration keine erfundene Testdauer.
+- Preis-/Leistungskarten ausschließlich aus veröffentlichten Tarifversionen. Ganze Cent, Monat/Jahr, Firma/Station und Stationslimit korrekt angezeigt; keine Entwürfe, internen Bearbeiterdaten oder erfundenen Beispielpreise.
+- Fehlende Tarife mit verständlichem Leerzustand. Registrierung ausdrücklich als nächster Schritt gekennzeichnet: Hauptaktion führt aktuell zum Informationsbereich, startet keinen Test und sammelt keine Konto-/Bankdaten.
+- Geplante Fachmodule als „In Vorbereitung“ ausgewiesen. Keine erfundenen Kunden, Zertifizierungen oder Aussagen absoluter Sicherheit. Rechtstexte vor Veröffentlichung als offen gekennzeichnet; lokale Vorschau mit noindex/nofollow.
+- Eigene lokale CSS-Datei ohne externe Schriften, Tracker oder zusätzliche Pakete. Sichtbarer Tastaturfokus, Sprunglink, semantische Bereiche und Unterstützung reduzierter Bewegung; keine behauptete Barrierefreiheitszertifizierung.
+- PHP-Startproblem aus den Zwischenmeldungen behoben: deklarierte/prüfbare Mindestversion passend zum Lockstand auf 8.4.1 korrigiert, keine Pakete aktualisiert. Neuer `scripts/nova.cmd` wählt PHP 8.4.26 und eigene php.ini auch in Windows PowerShell ohne `pwsh`, keine globale XAMPP-Umstellung. Start-/Konfigurations-/Artisan-Aufrufe erfolgreich geprüft. Individuelle lokale Kontodaten wurden nur auf ausdrücklichen Nutzerauftrag angepasst, nicht versioniert.
+
+### Prüfungen, Grenzen und nächster Schritt
+
+- 94 Standardtests mit 260 Assertions grün; zusätzlich echter MySQL-Integrationstest mit 3 Assertions grün. Sechs neue Landingpage-Tests: Leerzustand, veröffentlichte statt Entwurfsangebote, aktuelle Testregeln ohne Testanlage, neue Preisfassung bei unveränderter Historie, HTML-/Script-Escaping und ehrliche Navigation ohne Registrierungsformular.
+- Pint, Composer-Validierung/Plattformprüfung und Frontend-Build erfolgreich. Composer-Lockfile nur an die PHP-Anforderung angeglichen; keine Abhängigkeiten aktualisiert. HTML und CSS über lokales HTTP jeweils 200, Diff-Prüfung erfolgreich. Beide Dienste weiterhin ausschließlich 127.0.0.1.
+- Vorhandenen Browser-Tab neu geladen, ruhige Darstellung im schmalen Seitenpanel visuell geprüft und kostenlosen Testanker angeklickt. Tatsächlich konfigurierte Testregeln werden angezeigt. Keine Testpreise oder Beispiel-Testregeln in der Entwicklungsdatenbank angelegt; bestehende Nutzereinstellungen nicht überschrieben.
+- Eine Testaussage suchte zunächst nach einem falsch großgeschriebenen Textteil; an den tatsächlich vorgesehenen Registrierungshinweis angeglichen. Keine fachliche Prüfung entfernt.
+- Noch offen: echte Registrierung, E-Mail-Bestätigung, SEPA-Erfassung, Partner-Zusagesnapshot/Teststart, Ablauf-Nur-Lesen, Vertragsabschluss sowie Rechnungen. Rechtstexte, Produktivhärtung, vollständige Browser-/Desktop-/Geräte-/Accessibility-Abnahme bleiben offen. Keine Veröffentlichung oder Produktivfreigabe.
+
+Nächster einzelner Schritt: Partnerregistrierung mit Firmendaten, persönlichem Zugang, vorbereitender SEPA-Erfassung und E-Mail-Nachweis aufbauen. Testbedingungen beim bestätigten Teststart festschreiben; weiterhin kein automatischer kostenpflichtiger Abschluss.
+
+Git: Tarifverwaltung als `6843792` auf GitHub gesichert. Landingpage, lokaler PHP-Starter und Dokumentationsfortschritt P-013 derzeit lokal, noch nicht zusätzlich committet/gepusht.
+
+## Vorheriger Arbeitsstand P-012: Tarife und Testverwaltung
 
 18.10.2026: Zuerst P-011 nach erneuter grüner Prüfung als `835f3dc` committet und erfolgreich nach GitHub `origin/main` gepusht; Remote-Hash anschließend übereinstimmend geprüft. Danach neues lokales Fachpaket umgesetzt, weiterhin ohne Docker und ohne Eingriff in Archiv/Livesystem.
 
@@ -29,7 +73,7 @@ Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwec
 
 Nächster einzelner Schritt: Landingpage „Klar & ruhig“ an den veröffentlichten Katalog anbinden; danach Partnerregistrierung mit SEPA-Erfassung, E-Mail-Bestätigung und festgeschriebenen Testbedingungen.
 
-Git: Der ausdrücklich beauftragte bisherige Sicherheitsstand ist mit `835f3dc` auf GitHub gesichert. Neue Tarif-/Testverwaltung P-012 einschließlich dieses Leitfadens derzeit lokal, noch nicht zusätzlich committet/gepusht.
+Git: Tarif-/Testverwaltung P-012 als `6843792` nach ausdrücklichem Auftrag committet und erfolgreich nach `origin/main` gepusht; Remote-Hash geprüft.
 
 ## Vorheriger Arbeitsstand P-011: Sicherheitsgrundlage
 
@@ -223,11 +267,13 @@ Sicherheitskritische Funktionen, Verträge, Abrechnung und Geräte werden nie du
 | 18.10.2026 | P-004 IBAN-Rechner und Prüfer | Registrierung v3 und Bauplan um Berechnung/Prüfung ergänzt | Visuelle und Dateikontrolle; keine Software-/Bankprüfung | Bankregeln/Datenquelle und Designabnahme | Kein neuer Commit oder Push |
 | 18.10.2026 | P-005 Vertrag und Superadmin | Zwei neue Bildboards für kostenpflichtigen Abschluss/Kündigung und zentrale Tarif-/Testverwaltung; Bauplan konkretisiert | Beide Bilder visuell geprüft, lokale Verweise kontrolliert; keine funktionalen Vertrags-/Abrechnungstests | Gemeinsame Designabnahme, konkrete Tarifparameter, Stationsassistent sowie Admin-Detailansichten | Kein neuer Commit oder Push |
 | 18.10.2026 | P-011 Mandantentrennung, Rollen und Superadmin | Lokale Zugänge, Firmenmitgliedschaften, Policies, Kontext-/Scope-Basis, getrenntes Plattformpanel, sicherer manueller Bootstrap und deutsche Codekommentare | 53 Standardtests und 1 echter MySQL-Integrationstest grün; HTTP-/CSRF-Prüfung erfolgreich | Registrierung, stationsbezogene und sensible Rechte, MFA und weitere Betriebshärtung | Commit `835f3dc`, Push verifiziert |
-| 18.10.2026 | P-012 Tarife und Testverwaltung | Eigene Superadminseite, unveränderliche Fassungen, ausdrückliche Freigabe, konfliktgeschützte Testkonfiguration | 88 Standardtests und 1 MySQL-Integrationstest grün; Pint, Audits, Build und Zugriffsschutz geprüft | Landingpage/Registrierung und tatsächlicher Test-/Aboablauf | Neuer Stand lokal, noch nicht committet/gepusht |
+| 18.10.2026 | P-012 Tarife und Testverwaltung | Eigene Superadminseite, unveränderliche Fassungen, ausdrückliche Freigabe, konfliktgeschützte Testkonfiguration | 88 Standardtests und 1 MySQL-Integrationstest grün; Pint, Audits, Build und Zugriffsschutz geprüft | Registrierung und tatsächlicher Test-/Aboablauf | `6843792`, Push verifiziert |
+| 18.10.2026 | P-013 Landingpage | Ruhige öffentliche Vorschau mit veröffentlichten Preisen und aktiven Testregeln, getesteter Windows-PHP-Starter | 94 Standardtests und 1 MySQL-Integrationstest grün; PHP-Plattform, Build, HTTP/CSS und schmale Browseransicht geprüft | Registrierung/SEPA/E-Mail/Teststart und Produktivabnahme | Lokal, noch nicht committet/gepusht |
+| 18.10.2026 | P-014 Mockup-Angleichung | Türkis/Petrol, generiertes Tankstellenmotiv, fiktive HTML-App-Vorschau und kompakter Aufbau; positive Nutzerrückmeldung | 95 Standardtests und 1 MySQL-Integrationstest grün; Pint, Build und schmale Browseransicht geprüft | Partnerregistrierung und vollständige Produktivabnahme | Weiterhin nur lokal |
 
 ## Nächster Schritt
 
-Landingpage „Klar & ruhig“ mit veröffentlichten Tarifangeboten aufbauen; anschließend Partnerregistrierung mit SEPA/Bestätigung/festgeschriebenen Testbedingungen und später bewusster Aboabschluss. Native Einrichtung auf Rechner 2 und offene Sicherheitsmaßnahmen weiter prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
+Partnerregistrierung mit SEPA/Bestätigung/festgeschriebenen Testbedingungen aufbauen, danach bewusster Aboabschluss. Native Einrichtung auf Rechner 2 und offene Sicherheitsmaßnahmen weiter prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
 
 ## Historie des inzwischen erledigten Ordnerwechsels
 

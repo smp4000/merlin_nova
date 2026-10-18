@@ -28,6 +28,6 @@ Tarif-/Testkonfiguration ist jetzt unter `/superadmin/tarife` vorhanden: unverä
 
 Der Projektwurzelordner ist für Apache gesperrt. Die spätere Web-Anwendung darf erst mit eigenem vorgesehenem öffentlichen Einstieg gestartet werden, nicht durch Freigabe des gesamten Repositorys.
 
-Die lokale Statusseite läuft auf `http://127.0.0.1:8095`. Sie ist ausdrücklich noch keine Landingpage oder Anmeldemaske.
+Die lokale Landingpage „Klar & ruhig“ läuft auf `http://127.0.0.1:8095`: veröffentlichte Tarife und aktive Testbedingungen aus dem Superadmin. Noch keine öffentliche Registrierung oder Testaktivierung. Die Vorschau löst keine Verträge oder Zahlungen aus.
 
 Anmeldung: `http://127.0.0.1:8095/login`; Plattform: `http://127.0.0.1:8095/superadmin/login`.

@@ -4,7 +4,7 @@ Stand: 18.10.2026. Ausschließlich neue lokale Umgebung, kein Deployment.
 
 ## Voraussetzungen auf beiden Rechnern
 
-- Git, PowerShell 7, PHP ab 8.3 mit Composer 2; empfohlen PHP 8.4. Erweiterungen: curl, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium, zip; PHPUnit zusätzlich DOM/XML.
+- Git, PowerShell 7, PHP ab 8.4.1 mit Composer 2 (aktueller lokaler Stand: 8.4.26). Die gepinnten Abhängigkeiten benötigen mindestens 8.4.1; XAMPP-PHP 8.2 ist nicht ausreichend. Erweiterungen: curl, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium, zip; PHPUnit zusätzlich DOM/XML.
 - Node.js ab 22.12 mit npm. Abhängigkeiten werden aus Lockdateien installiert.
 - Freie Ports 3307 und 8095. Bestehende XAMPP-Dienste nicht umstellen.
 - Microsoft Visual C++ Redistributable für MySQL, falls auf Rechner 2 noch nicht vorhanden.
@@ -18,7 +18,7 @@ Die ignorierte lokale PHP-Laufzeit unter `.runtime/php` wurde aus den Laufzeitda
 2. `pwsh -File scripts/setup-local.ps1` ausführen. Das Skript lädt das offizielle MySQL-8.4.11-Windows-ZIP (rund 268 MB), prüft SHA-256 und Oracle-Signatur und installiert nur unter `.runtime`. Kein Windows-Dienst, kein systemweiter Installer.
 3. Das Skript erzeugt zufällige lokale Geheimnisse, startet eigenes MySQL auf `127.0.0.1:3307`, installiert Abhängigkeiten, migriert nur die Entwicklungsdatenbank und baut das Frontend. Vorhandene Konfiguration wird nicht überschrieben.
 4. Im Ordner `web`: `php artisan serve --host=127.0.0.1 --port=8095`.
-5. `http://127.0.0.1:8095` öffnen. Derzeit nur eine Statusmeldung, noch keine fertige Landingpage. Anmeldung unter `/login`, Plattformzugang unter `/superadmin/login`; keine voreingestellten Konten.
+5. `http://127.0.0.1:8095` öffnet die Landingpage mit veröffentlichten Tarifen und aktiven Testregeln. Ohne Angebote/Testregeln erscheinen verständliche Hinweise, keine Beispielwerte. Registrierung/Teststart folgen noch. Anmeldung unter `/login`, Plattformzugang unter `/superadmin/login`; keine voreingestellten Konten.
 
 Bei Nutzung der vorhandenen lokalen PHP-Laufzeit vorher in PowerShell:
 
@@ -62,10 +62,12 @@ Der lokale Guard verwirft fremde Hosts, Standardport 3306, Rootbenutzer, andere 
 
 ## Lokalen Superadmin bewusst anlegen
 
+Windows-PowerShell ohne `pwsh`: Der Starter `scripts/nova.cmd` verwendet ausdrücklich die eigene PHP-Laufzeit und php.ini. Aus `web` beispielsweise `..\scripts\nova.cmd artisan --version`. Kein Rückgriff auf XAMPP-PHP 8.2 und keine globale Konfigurationsänderung. Ein bereits vorhandenes Konto nicht erneut anlegen; die Meldung schützt vor stiller Hochstufung.
+
 Im Ordner `web`, nach Einrichtung und Migration:
 
 ```powershell
-php artisan nova:superadmin admin@example.test --name="Lokale Plattformverwaltung"
+..\scripts\nova.cmd artisan nova:superadmin admin@example.test --name="Lokale Plattformverwaltung"
 ```
 
 Der Befehl fragt das Passwort verdeckt zweimal ab (mindestens 14 Zeichen, Groß-/Kleinbuchstaben, Zahl, Sonderzeichen). Kein Passwort als Kommandozeilenargument und kein Standardpasswort. Ein bereits vorhandenes Konto wird nicht hochgestuft. Die E-Mail-Adresse wird nur für diese ausdrücklich lokale Ersteinrichtung als bestätigt markiert; es wird keine E-Mail versendet. Diese Adresse ist ein Beispiel, nicht ein bereits vorhandener Zugang.
@@ -112,6 +114,10 @@ Die technische Mindest-/Höchstprüfung erlaubt Testdauer 1–3650 Tage, Station
 Prüfstand P-012: 88 Standardtests (darunter 35 neue Billing-Fälle) und ein separater MySQL-Integrationstest grün. Die tatsächliche gleichzeitige Mehrprozesslast und visuelle Browserabnahme sind noch offen.
 
 ## Verbleibende Betriebsgrenzen
+
+Mockup-Angleichung P-014: Landingpage jetzt in Türkis/Petrol mit lokalem generiertem Tankstellenmotiv und ausdrücklich fiktiver HTML-App-Vorschau. 95 Standardtests plus ein MySQL-Integrationstest grün; veröffentlichte Tarife und aktive Testregeln bleiben angebunden. Vorschau-Daten niemals durch echte Partner-/Mitarbeiterdaten ersetzen. Auf schmalen Bildschirmen werden Hero, Vorschau und Schritte gestapelt. Keine vollständige Desktop-/Accessibility-Abnahme oder Produktivfreigabe.
+
+Landingpage-Prüfstand P-013: 94 Standardtests plus ein echter MySQL-Integrationstest grün. Veröffentlichung/Preiswechsel, unsichtbare Entwürfe, aktuelle Testregeln und sicheres HTML-Escaping geprüft. Registrierungshinweis ist kein funktionsfähiges Registrierungsformular. Die lokale Vorschau ist für Suchmaschinen als noindex/nofollow markiert; keine öffentliche Bereitstellung erfolgt.
 
 - Apache-Zugriff auf die Projektwurzel bleibt gesperrt. Ausschließlich der Loopback-Entwicklungsserver wird verwendet.
 - Keine echten Personen-/Bankdaten, E-Mails, Zahlungsanforderungen, Lastschriften, Geräte- oder Druckerzugriffe.
