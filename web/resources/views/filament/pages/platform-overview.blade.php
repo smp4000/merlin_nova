@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     <x-filament::section heading="Merlin Nova – Plattformverwaltung">
-        <p>Hier verwalten Sie künftig Partner, Tarife und Abrechnung. Aktuell ist die sichere Zugangsgrundlage eingerichtet.</p>
+        <p>Die Zugangsgrundlage sowie die Verwaltung von Tarifversionen und Testregeln sind eingerichtet. Verträge und Abrechnung folgen.</p>
+        <p><a href="{{ \App\Filament\Pages\BillingSettings::getUrl() }}">Tarife und Testphase verwalten</a></p>
         <p>Plattformrechte öffnen keine Personalakten und ersetzen keine Partnerberechtigung.</p>
     </x-filament::section>
     <x-filament::section heading="Partner – maximal 50 Einträge">

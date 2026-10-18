@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\BillingSettings;
 use App\Filament\Pages\PlatformOverview;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
@@ -36,7 +37,7 @@ class PlatformPanelProvider extends PanelProvider
             ->colors(['primary' => Color::Blue])
             ->defaultThemeMode(ThemeMode::Light)->darkMode(false)
             ->maxContentWidth(Width::Full)->font(null)
-            ->pages([PlatformOverview::class])
+            ->pages([PlatformOverview::class, BillingSettings::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

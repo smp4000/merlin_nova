@@ -12,7 +12,8 @@ use Filament\Pages\Dashboard;
  * Aktuell werden ausschließlich Firmennamen und der technische Aktivstatus
  * angezeigt. Ein Superadmin kann dadurch Plattformpartner überblicken, erhält
  * aber keine Mitgliedschaft und keinen Durchgriff auf operative Partnerdaten.
- * Tarifverwaltung, Supportfreigaben und Abrechnung kommen in eigenen Paketen.
+ * Die Tarif-/Testverwaltung ist eine eigene Seite. Supportfreigaben und
+ * tatsächliche Abrechnung bleiben separate, noch offene Fachpakete.
  */
 class PlatformOverview extends Dashboard
 {

@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Support\LocalEnvironment;
 use App\Tenancy\PartnerContext;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,10 +30,10 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Zusätzliche Startaktionen sind derzeit bewusst nicht erforderlich.
+     * Eng begrenztes Plattformrecht statt globalem Policy-Bypass registrieren.
      */
     public function boot(): void
     {
-        //
+        Gate::define('manage-billing', fn (User $user): bool => $user->is_active && $user->is_super_admin && $user->hasVerifiedEmail());
     }
 }

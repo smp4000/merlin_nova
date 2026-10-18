@@ -24,6 +24,8 @@ Die alten lokalen Konfigurationsdateien enthalten gegebenenfalls Pfade des früh
 
 Als nächstes Fachpaket folgen Landingpage, Partnerregistrierung und zentral gesteuerte Test-/Aboverwaltung. Offene Sicherheits-/Betriebsarbeiten bleiben im Leitfaden sichtbar; keine Produktivfreigabe.
 
+Tarif-/Testkonfiguration ist jetzt unter `/superadmin/tarife` vorhanden: unveränderliche Fassungen, explizite Veröffentlichung und konfigurierbare künftige Testbedingungen. Noch keine automatische Aboaktivierung oder Abrechnung. [Bedienung und Grenzen](docs/LOCAL-DEVELOPMENT.md).
+
 Der Projektwurzelordner ist für Apache gesperrt. Die spätere Web-Anwendung darf erst mit eigenem vorgesehenem öffentlichen Einstieg gestartet werden, nicht durch Freigabe des gesamten Repositorys.
 
 Die lokale Statusseite läuft auf `http://127.0.0.1:8095`. Sie ist ausdrücklich noch keine Landingpage oder Anmeldemaske.

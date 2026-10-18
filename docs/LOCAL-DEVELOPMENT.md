@@ -96,7 +96,22 @@ Keine rohen SQL-Zugriffe, `withoutGlobalScopes` oder ungeprüften Bulk-Updates i
 
 Zweck und Sicherheitsentscheidungen wichtiger Klassen ausführlich auf Deutsch dokumentieren; englische Codebezeichner beibehalten. Klassen-/Methodenkommentare bei Funktionsänderungen aktualisieren.
 
-## Verbleibende Grenzen
+## Tarife und Testregeln lokal bedienen
+
+1. Als bestätigter aktiver Superadmin `/superadmin/tarife` öffnen.
+2. Links Testdauer und Stationslimit bewusst eingeben und aktivieren. Ohne diese Eingabe existiert kein vorgegebener Teststandard.
+3. Rechts neuen Tarif mit stabilem Code, Anzeigename, Beschreibung und positivem EUR-Nettopreis erstellen. Preise beispielsweise als `12,34` oder `12.34`, ohne Tausendertrennzeichen. Monat/Jahr und Preis pro Firma/Station auswählen.
+4. „Neue Entwurfsfassung speichern“ veröffentlicht nichts. Für Änderungen bestehenden Tarif auswählen und eine neue Fassung speichern; alte Fassungen werden nicht bearbeitet.
+5. Erst die Bestätigung unter „Fassungen und Freigabe“ setzen, dann die gewünschte Fassung veröffentlichen. Wiederholung erzeugt keinen zweiten Freigabenachweis; zurückliegende Fassungen werden nicht wieder aktiviert.
+6. Bei Konfliktmeldung Seite neu laden und den inzwischen gültigen Stand prüfen. Zwei Adminfenster sollen sich nicht unbemerkt überschreiben.
+
+Gespeichert werden nur Katalog-/Testregeldaten sowie Bearbeiter-ID und Zeitpunkte. Registrierung, Partner-Teststart, festgeschriebene Zusagen, Nur-Lesen nach Ablauf, SEPA und echte Rechnungen folgen separat. Die Konfiguration löst keine Zahlungen oder Vertragsänderungen aus. Keine Beispielpreise/Testregeln in der Entwicklungsdatenbank vorbefüllt.
+
+Die technische Mindest-/Höchstprüfung erlaubt Testdauer 1–3650 Tage, Stationslimits 1–10000; beim Tarif bedeutet ein leeres Stationslimit unbegrenzt. Netto-EUR ist aktuell die einzige Preiswährung, keine Steuerberechnung. Historische Bedingungen werden im Service/Eloquent geschützt, nicht gegen privilegierte direkte SQL-Zugriffe.
+
+Prüfstand P-012: 88 Standardtests (darunter 35 neue Billing-Fälle) und ein separater MySQL-Integrationstest grün. Die tatsächliche gleichzeitige Mehrprozesslast und visuelle Browserabnahme sind noch offen.
+
+## Verbleibende Betriebsgrenzen
 
 - Apache-Zugriff auf die Projektwurzel bleibt gesperrt. Ausschließlich der Loopback-Entwicklungsserver wird verwendet.
 - Keine echten Personen-/Bankdaten, E-Mails, Zahlungsanforderungen, Lastschriften, Geräte- oder Druckerzugriffe.

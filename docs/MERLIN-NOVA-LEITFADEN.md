@@ -2,7 +2,36 @@
 
 Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwechsel.
 
-## Aktueller Arbeitsstand P-011: Sicherheitsgrundlage
+## Aktueller Arbeitsstand P-012: Tarife und Testverwaltung
+
+18.10.2026: Zuerst P-011 nach erneuter grüner Prüfung als `835f3dc` committet und erfolgreich nach GitHub `origin/main` gepusht; Remote-Hash anschließend übereinstimmend geprüft. Danach neues lokales Fachpaket umgesetzt, weiterhin ohne Docker und ohne Eingriff in Archiv/Livesystem.
+
+### Umgesetzt
+
+- Eigene übersichtliche Superadmin-Seite `/superadmin/tarife`, erreichbar auch aus der Plattformübersicht: getrennte Bereiche für Testregeln, Tarifentwurf und bewusste Veröffentlichung.
+- Tarifcode als stabile Identität; frei eingegebener Anzeigename, Beschreibung, EUR-Nettopreis, monatliche/jährliche Periode, Preis pro Firma/Station und optionales Stationslimit.
+- Preisverarbeitung ausschließlich in ganzen Cent, ohne Float-Rundung oder stilles Interpretieren von Tausendertrennzeichen. Keine Beispieltarife oder Preise automatisch aktiviert.
+- Jeder Entwurf ist eine neue unveränderliche nummerierte Fassung. Veröffentlichung benötigt eine ausdrückliche Bestätigung; separate Freigabehistorie mit Bearbeiter und Zeitpunkt. Alte Preisfassungen bleiben erhalten, historische Fassungen werden nicht wieder aktiviert.
+- Transaktionen/Zeilensperren, eindeutige Versionsnummern und erwartete vorherige Zeiger verhindern unbeabsichtigtes Überschreiben aus veralteten Adminformularen. Wiederholte Veröffentlichung derselben aktiven Fassung ist idempotent.
+- Getrennte unveränderliche Testregel-Fassungen mit Testdauer und Stationslimit. Ohne bewusste Konfiguration existiert kein stiller Teststandard. Neue Regeln überschreiben keine früher gespeicherten Bedingungen.
+- Veröffentlichte Angebotsgrundlage filtert Entwürfe und interne Bearbeiterdaten aus; noch keine öffentliche HTTP-Katalogschnittstelle oder Landingpage angebunden.
+- Jede schreibende Serviceaktion prüft aktive bestätigte Plattformrechte erneut. Berechtigungsentzug wird auch bei Livewire-Folgeanfragen abgefangen. Wichtige Models, Service und Oberfläche ausführlich auf Deutsch kommentiert.
+
+### Tatsächliche Prüfungen und Grenzen
+
+- 88 Standardtests mit 206 Assertions grün; zusätzlich echter MySQL-Integrationstest mit 3 Assertions grün. Darunter 35 neue Billing-Testfälle für Freigabe, Centbeträge, Eingabegrenzen, alte Fassungen, veraltete Formulare, falsche Tarif-/Versionskombinationen und fehlende/entzogene Rechte.
+- Pint, Composer-Validierung, Composer-/npm-Audit sowie Frontend-Build erfolgreich. Keine Abhängigkeiten neu installiert. Migration nur auf neuer lokaler Entwicklungsdatenbank; Tests ausschließlich auf `merlin_nova_test`.
+- Anonymer echter HTTP-Aufruf der Tarifseite wird mit 302 zur Plattformanmeldung weitergeleitet. Komponentenformulare/Freigabebestätigung automatisiert durchgespielt; visuelle Browserabnahme und echte zeitgleiche Mehrprozess-Lasttests noch offen.
+- Eine erste Livewire-Testverkettung rief nach bereits abgewiesener Rechteänderung noch einmal eine Komponente ohne gültigen Snapshot auf. Testablauf korrigiert: Formular vor Rechteentzug vorbereiten, dann genau die verbotene Mutation prüfen; Zugriffsschutz nicht gelockert.
+- Registrierung, E-Mail-Nachweis/Teststart, Zusagesnapshot am Partner, Ablauf-Nur-Lesen, ausdrücklicher Aboabschluss, SEPA, Rechnungen und Kündigung sind noch nicht implementiert. Die Seite erläutert diese festen künftigen Produktregeln, simuliert aber keinen fertigen Partnerablauf.
+- Kein Modulbaukasten, Umsatzsteuer-/Rechnungsberechnung, Tarifarchivierung oder vollständige Vertragslaufzeitverwaltung. Technische Eingabegrenzen: Testdauer 1–3650 Tage, Stationslimit 1–10000 (Tariflimit alternativ leer/unbegrenzt); Preise positiv mit höchstens zwei Nachkommastellen. Aktuell maximal 200 Tarifköpfe, zehn Tarif- und fünf Testfassungen gleichzeitig in der Ansicht.
+- Historie wird auf Eloquent-/Serviceebene geschützt, nicht gegen Datenbankadministratoren oder rohe SQL-/Bulk-Manipulationen. Keine Produktiv-/DSGVO-Freigabe und keine Zusage absoluter Sicherheit.
+
+Nächster einzelner Schritt: Landingpage „Klar & ruhig“ an den veröffentlichten Katalog anbinden; danach Partnerregistrierung mit SEPA-Erfassung, E-Mail-Bestätigung und festgeschriebenen Testbedingungen.
+
+Git: Der ausdrücklich beauftragte bisherige Sicherheitsstand ist mit `835f3dc` auf GitHub gesichert. Neue Tarif-/Testverwaltung P-012 einschließlich dieses Leitfadens derzeit lokal, noch nicht zusätzlich committet/gepusht.
+
+## Vorheriger Arbeitsstand P-011: Sicherheitsgrundlage
 
 18.10.2026: Mandanten-/Rollenbasis und getrennte Plattformverwaltung lokal umgesetzt. Docker, Archiv und Livesystem nicht verändert. Keine neuen Pakete installiert und keine echten Konten angelegt.
 
@@ -29,7 +58,7 @@ Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwec
 
 Nächster einzelner Schritt: konfigurierbare Tarife und Testdauer im Superadmin als Grundlage des ersten gemeinsamen Fachpakets Landingpage → Partnerregistrierung mit SEPA und Bestätigung → Test-/Aboablauf.
 
-Git: Änderungen dieses Pakets lokal vorhanden, noch nicht committet oder gepusht. Bisheriger synchronisierter Stand bleibt `28a7149` aus P-010. Keine automatische Git-Sicherung behauptet.
+Git: Paket P-011 am 18.10.2026 nach ausdrücklichem Auftrag als `835f3dc` committet und erfolgreich nach `origin/main` gepusht; Übereinstimmung des Remote-Hashes geprüft.
 
 ## Vorheriger Arbeitsstand P-010
 
@@ -125,7 +154,7 @@ Die frühere Aussage, den Schichtplaner wegzulassen, ist durch N-011 ausdrückli
 | --- | --- | --- | --- |
 | 0 Planung | Baupläne, Mockups, Entscheidungen und begrenzter erster Lieferumfang | Gemeinsame Freigabe, offene Punkte benannt | In Arbeit |
 | 1 Technische Grundlage | Sauberes Projekt, individuelles Designsystem, MySQL-Lokalsystem, Anmeldung, Mandantentrennung, Rollen, Superadmin, CI | Zwei Rechner starten reproduzierbar; negative Zugriffstests grün | In Arbeit: lokale Anmeldung, Mandanten-/Rollenbasis und Superadmin getestet; CI, MFA/Betriebshärtung, finales Designsystem und Rechner 2 offen |
-| 2 Landingpage und Partner mit Abo | Registrierung, Bestätigung, Partnerkonto, Tarifkatalog, Tarifversionen, Rechnungs-/Mandatsdaten, Adminübersicht | Vollständiger Partnerdurchlauf mit Testabo; keine echten Forderungen oder Lastschriften | Offen |
+| 2 Landingpage und Partner mit Abo | Registrierung, Bestätigung, Partnerkonto, Tarifkatalog, Tarifversionen, Rechnungs-/Mandatsdaten, Adminübersicht | Vollständiger Partnerdurchlauf mit Testabo; keine echten Forderungen oder Lastschriften | In Arbeit: Tarif-/Testkonfiguration im Superadmin getestet, Partnerablauf noch offen |
 | 3 Stationen | Stationsassistent, Benzinpreissuche, manuelle Alternative, Partnerfarben, tarifliche Stationsgrenzen | Zweite Station im eigenen Mandanten anlegen, fremde Station bleibt unzugänglich | Offen |
 | 4 Mitarbeiter und Verträge | Fachliche Haupttabs, geschützte Dokumente, Mehrstationszuordnung, separate Zugänge, Vertragsverlauf | Mitarbeiter mit zwei Stationen, Vertragswechsel und Rechteprüfung durchspielen | Offen |
 | 5 Personaleinsatzplanung | Bedarf, Verfügbarkeit, Abwesenheiten, Wochenplanung, Regelprüfung, Veröffentlichung | Konkurrierende Pläne und stationsübergreifende Konflikte zuverlässig erkennen | Offen |
@@ -193,11 +222,12 @@ Sicherheitskritische Funktionen, Verträge, Abrechnung und Geräte werden nie du
 | 18.10.2026 | P-003 Registrierung mit vorbereitendem SEPA | Teststart und lesender Ablauf bestätigt; SEPA-Erfassung vor Testbeginn; Kündigung zum bezahlten Periodenende; Landingpage und Registrierung als Mockups v2 überarbeitet | Beide Bildentwürfe visuell auf Kernaussagen geprüft; Dokument-/Dateiverweise geprüft; keine Software-/Banktests | Designabnahme, rechtliche Mandats-/Vertragstexte und konkrete Tarifparameter | Kein neuer Commit oder Push |
 | 18.10.2026 | P-004 IBAN-Rechner und Prüfer | Registrierung v3 und Bauplan um Berechnung/Prüfung ergänzt | Visuelle und Dateikontrolle; keine Software-/Bankprüfung | Bankregeln/Datenquelle und Designabnahme | Kein neuer Commit oder Push |
 | 18.10.2026 | P-005 Vertrag und Superadmin | Zwei neue Bildboards für kostenpflichtigen Abschluss/Kündigung und zentrale Tarif-/Testverwaltung; Bauplan konkretisiert | Beide Bilder visuell geprüft, lokale Verweise kontrolliert; keine funktionalen Vertrags-/Abrechnungstests | Gemeinsame Designabnahme, konkrete Tarifparameter, Stationsassistent sowie Admin-Detailansichten | Kein neuer Commit oder Push |
-| 18.10.2026 | P-011 Mandantentrennung, Rollen und Superadmin | Lokale Zugänge, Firmenmitgliedschaften, Policies, Kontext-/Scope-Basis, getrenntes Plattformpanel, sicherer manueller Bootstrap und deutsche Codekommentare | 53 Standardtests und 1 echter MySQL-Integrationstest grün; HTTP-/CSRF-Prüfung erfolgreich | Tarif-/Testverwaltung, Registrierung, stationsbezogene und sensible Rechte, MFA und weitere Betriebshärtung | Lokal, noch kein Commit/Push für P-011 |
+| 18.10.2026 | P-011 Mandantentrennung, Rollen und Superadmin | Lokale Zugänge, Firmenmitgliedschaften, Policies, Kontext-/Scope-Basis, getrenntes Plattformpanel, sicherer manueller Bootstrap und deutsche Codekommentare | 53 Standardtests und 1 echter MySQL-Integrationstest grün; HTTP-/CSRF-Prüfung erfolgreich | Registrierung, stationsbezogene und sensible Rechte, MFA und weitere Betriebshärtung | Commit `835f3dc`, Push verifiziert |
+| 18.10.2026 | P-012 Tarife und Testverwaltung | Eigene Superadminseite, unveränderliche Fassungen, ausdrückliche Freigabe, konfliktgeschützte Testkonfiguration | 88 Standardtests und 1 MySQL-Integrationstest grün; Pint, Audits, Build und Zugriffsschutz geprüft | Landingpage/Registrierung und tatsächlicher Test-/Aboablauf | Neuer Stand lokal, noch nicht committet/gepusht |
 
 ## Nächster Schritt
 
-Konfigurierbare Tarife und Testdauer im Superadmin auf der getesteten Sicherheitsgrundlage aufbauen; erstes gemeinsames Fachpaket bleibt Landingpage → Partnerregistrierung mit SEPA/Bestätigung/Testphase → Abos. Native Einrichtung auf Rechner 2 und offene Sicherheitsmaßnahmen weiter prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
+Landingpage „Klar & ruhig“ mit veröffentlichten Tarifangeboten aufbauen; anschließend Partnerregistrierung mit SEPA/Bestätigung/festgeschriebenen Testbedingungen und später bewusster Aboabschluss. Native Einrichtung auf Rechner 2 und offene Sicherheitsmaßnahmen weiter prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
 
 ## Historie des inzwischen erledigten Ordnerwechsels
 
