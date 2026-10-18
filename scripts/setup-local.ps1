@@ -1,3 +1,9 @@
+<#
+Reproduzierbare Einrichtung ausschließlich im neuen lokalen Projektordner.
+Vorhandene Konfiguration wird nicht überschrieben; MySQL bleibt ein eigener
+Prozess. Filament-Assets werden aus den gepinnten Composer-Paketen erzeugt,
+damit generierte Dateien nicht als zweite Versionsquelle in Git landen.
+#>
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $runtime = Join-Path $root '.runtime\php'
@@ -30,6 +36,8 @@ try {
         }
         & composer install --no-interaction
         if ($LASTEXITCODE -ne 0) { throw 'Composer-Installation fehlgeschlagen.' }
+        & php artisan filament:assets
+        if ($LASTEXITCODE -ne 0) { throw 'Lokale Filament-Assets konnten nicht erzeugt werden.' }
         & php artisan migrate
         if ($LASTEXITCODE -ne 0) { throw 'Lokale Migration fehlgeschlagen.' }
         & npm ci --ignore-scripts

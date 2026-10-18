@@ -4,6 +4,15 @@ namespace App\Support;
 
 use RuntimeException;
 
+/**
+ * Harte Fehlkonfigurationssperre für den gegenwärtig rein lokalen Neuaufbau.
+ *
+ * Entwicklungs- und Testdatenbank müssen getrennte festgelegte Namen tragen.
+ * Auch alternative Verbindungs-URLs und Sockets sind gesperrt, da sie sonst
+ * die erlaubte Kombination aus Host, Port und Datenbank umgehen könnten.
+ * Dies ist keine Produktionskonfiguration: Eine spätere Bereitstellung braucht
+ * einen eigenen geprüften Betriebsauftrag, nicht das Abschalten dieser Regel.
+ */
 final class LocalEnvironment
 {
     public static function validate(array $settings): void

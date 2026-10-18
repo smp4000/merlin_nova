@@ -2,24 +2,23 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Absichtlich keine vorgegebenen Benutzer oder bekannten Standardpasswörter.
+ * Lokale Superadmins werden nur über nova:superadmin mit eigener verdeckter
+ * Passworteingabe angelegt. Test-Factories gehören ausschließlich in Tests.
+ */
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
     /**
-     * Seed the application's database.
+     * Keine stillschweigende Konten- oder Rechtevergabe bei db:seed.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Fachliche Beispieldaten erhalten später einen gesonderten Auftrag.
     }
 }

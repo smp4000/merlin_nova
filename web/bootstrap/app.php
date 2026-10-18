@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Middleware\RequireActiveUser;
+use App\Http\Middleware\ResolvePartner;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,7 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Erst Konto und Bestätigung prüfen, dann den Partner freigeben.
+        // Das anschließende Route Binding darf nur in diesem Kontext suchen.
+        $middleware->prependToPriorityList(SubstituteBindings::class, ResolvePartner::class);
+        $middleware->prependToPriorityList(ResolvePartner::class, EnsureEmailIsVerified::class);
+        $middleware->prependToPriorityList(EnsureEmailIsVerified::class, RequireActiveUser::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

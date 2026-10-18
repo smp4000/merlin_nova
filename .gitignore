@@ -18,6 +18,9 @@
 **/*.log
 .runtime/
 .local/
+web/public/css/filament/
+web/public/js/filament/
+web/public/fonts/filament/
 .idea/
 **/local.properties
 **/keystore.properties

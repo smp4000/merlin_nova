@@ -2,7 +2,38 @@
 
 Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwechsel.
 
-## Aktueller Arbeitsstand P-010
+## Aktueller Arbeitsstand P-011: Sicherheitsgrundlage
+
+18.10.2026: Mandanten-/Rollenbasis und getrennte Plattformverwaltung lokal umgesetzt. Docker, Archiv und Livesystem nicht verändert. Keine neuen Pakete installiert und keine echten Konten angelegt.
+
+### Umgesetzt
+
+- Firmen als Partner, persönliche Benutzerkonten und eindeutige aktive Mitgliedschaften getrennt gespeichert. Ein Benutzer kann bei mehreren Firmen unterschiedliche Rollen besitzen.
+- Rollen: Inhaber, Verwaltung, Mitarbeiter, lesend. Konto-/Firmen-/Mitgliedschaftssperren und fehlende E-Mail-Bestätigung werden serverseitig geprüft.
+- Partnerkontext als kurzlebiger scoped Service, Auflösung vor Route Model Binding, Bereinigung auch bei Fehlern. Fremde Partner und fremde Stations-IDs werden nicht offengelegt.
+- `PartnerOwnedModel` als fail-closed Basis für operative Eloquent-Modelle: Abfragen ohne Kontext verweigert, Partnerzuordnung beim Speichern geschützt, fremde geladene Objekte auch beim Löschen gesperrt. Keine behauptete MySQL-Row-Level-Security; rohe SQL-Abfragen oder bewusst umgangene Eloquent-Scopes bleiben eine interne Vertrauensgrenze.
+- Minimale Stationstabelle und geschützte Namens-Endpunkte als tatsächlicher Lese-/Schreibnachweis. Noch kein Stationsassistent, keine Preisabfrage und keine stationsbezogenen Rollen.
+- Eigene ruhige Anmeldeseite `/login`, persönliche Arbeitsbereichsübersicht `/app`, Anmeldung mit Versuchslimits und Sitzungswechsel, Abmeldung mit Sitzungs-/CSRF-Erneuerung. Geschützte Partnerantworten nicht zwischenspeicherbar.
+- Getrenntes Filament-Plattformpanel `/superadmin` mit eigener Übersicht und maximal 50 Firmen-Metadatensätzen. Ausschließlich aktive bestätigte Superadmins; Rechteprüfung auch für Livewire-Folgeanfragen. Kein globaler Policy-Bypass und keine automatische Partner-Mitgliedschaft.
+- Lokaler Bootstrap `php artisan nova:superadmin <email>` mit verdecktem starkem bestätigtem Passwort. Bestehende Konten werden nicht hochgestuft. Default-Seeder legt keine bekannten Standardzugänge mehr an.
+- Models, Policies, Mandantenlogik, Panel und wichtige Einstiegspunkte ausführlich auf Deutsch dokumentiert; die dauerhafte Kommentierungsvorgabe steht in beiden AGENTS-Dateien. Noch keine CRUD-Ressourcen erzeugt.
+
+### Prüfungen und Grenzen
+
+- 53 Standardtests mit 135 Assertions grün; zusätzlich echter MySQL-Integrationstest mit 3 Assertions grün. Nur `merlin_nova_test` wird für Tests migriert.
+- Abgedeckt: fremde IDs, getrennte Rollen bei mehreren Firmen, Schreib-/Leserechte, Inhaber-Zugangsliste, manipulierte Partner-/Privilegienfelder, deaktivierte Konten/Firmen/Mitgliedschaften, Rechteentzug, fehlender und bereinigter Kontext, fremde geladene Objekte, Superadmin ohne Partnerrechte, Livewire-Rechteentzug, Loginlimits, Passwort-Hashing und sichere Kontoerstellung.
+- Neue Migrationen ausschließlich auf `merlin_nova_dev` ausgeführt. Beide lokalen Loginseiten über HTTP mit 200 geprüft; echte POST-Anfrage ohne CSRF mit 419 abgewiesen. Listener unverändert ausschließlich 127.0.0.1:8095 und 127.0.0.1:3307.
+- Pint, Composer-Validierung, Composer-/npm-Audit und Frontend-Build erfolgreich; keine gemeldeten Abhängigkeits-Sicherheitslücken. Setup-Skript syntaktisch geprüft, Git-Diff-Prüfung grün, lokale Daten/Geheimnisse und generierte Filament-Assets ausgeschlossen. Entwicklungsdatenbank abschließend geprüft: null Benutzer, null Partner; Testkonten blieben ausschließlich in der Testdatenbank. Erste Testläufe deckten fehlende Modell-Standardwerte, Middleware-Reihenfolge und einen Route-Parameterfehler auf; Ursachen korrigiert, Tests nicht abgeschaltet.
+- Kein fertiges Abo-/Registrierungsmodul, kein E-Mail-Bestätigungsversand, keine MFA, kein Passwort-Reset und kein vollständiges Sicherheits-Auditprotokoll. Personen-/Dokument-/Bankdatenberechtigungen, stationseigene Rechte, Jobs/MDE/Druckzugriffe und Abo-bedingter Nur-Lese-Modus sind noch nicht implementiert.
+- Keine Produktivfreigabe oder Aussage absoluter Sicherheit/DSGVO-Konformität; technische und organisatorische Abnahme bleibt erforderlich. Browser-Interaktionsabnahme und Einrichtung auf Rechner 2 noch offen.
+
+Nächster einzelner Schritt: konfigurierbare Tarife und Testdauer im Superadmin als Grundlage des ersten gemeinsamen Fachpakets Landingpage → Partnerregistrierung mit SEPA und Bestätigung → Test-/Aboablauf.
+
+Git: Änderungen dieses Pakets lokal vorhanden, noch nicht committet oder gepusht. Bisheriger synchronisierter Stand bleibt `28a7149` aus P-010. Keine automatische Git-Sicherung behauptet.
+
+## Vorheriger Arbeitsstand P-010
+
+Zusätzliche Vorgabe vom 18.10.2026: Models, Filament-Ressourcen und wichtige Codebereiche ausführlich auf Deutsch kommentieren, damit Zweck, Zusammenhänge und Entscheidungen langfristig nachvollziehbar bleiben. Verbindlich in den Projektregeln aufgenommen; auch im laufenden Sicherheits-Arbeitspaket anzuwenden. Englische Codebezeichner bleiben unverändert vorgeschrieben.
 
 Technische Grundlage am 18.10.2026 durch „ja leg los“ freigegeben und begonnen; anschließend ausdrücklich „ohne Docker“ bestätigt. Neues Git an der Projektwurzel, Remote `https://github.com/smp4000/merlin_nova.git` vor Einrichtung ohne Referenzen geprüft. Laravel 13.37.0 und Filament 5.10.2 unter `web/` installiert; PHP 8.4.26, Frontend-Abhängigkeiten und Lockdateien vorhanden. Keine Altanwendung oder alten Zugangsdaten übernommen. Nur PHP-Laufzeitdateien ohne alte php.ini in ignorierten lokalen Laufzeitordner kopiert.
 
@@ -93,7 +124,7 @@ Die frühere Aussage, den Schichtplaner wegzulassen, ist durch N-011 ausdrückli
 | Phase | Ergebnis | Abnahmepunkt | Neuaufbau |
 | --- | --- | --- | --- |
 | 0 Planung | Baupläne, Mockups, Entscheidungen und begrenzter erster Lieferumfang | Gemeinsame Freigabe, offene Punkte benannt | In Arbeit |
-| 1 Technische Grundlage | Sauberes Projekt, individuelles Designsystem, MySQL-Lokalsystem, Anmeldung, Mandantentrennung, Rollen, Superadmin, CI | Zwei Rechner starten reproduzierbar; negative Zugriffstests grün | In Arbeit: Frameworks, natives MySQL und Schutz-/Integrationstests vorhanden; fachliche Sicherheitsgrundlage noch offen |
+| 1 Technische Grundlage | Sauberes Projekt, individuelles Designsystem, MySQL-Lokalsystem, Anmeldung, Mandantentrennung, Rollen, Superadmin, CI | Zwei Rechner starten reproduzierbar; negative Zugriffstests grün | In Arbeit: lokale Anmeldung, Mandanten-/Rollenbasis und Superadmin getestet; CI, MFA/Betriebshärtung, finales Designsystem und Rechner 2 offen |
 | 2 Landingpage und Partner mit Abo | Registrierung, Bestätigung, Partnerkonto, Tarifkatalog, Tarifversionen, Rechnungs-/Mandatsdaten, Adminübersicht | Vollständiger Partnerdurchlauf mit Testabo; keine echten Forderungen oder Lastschriften | Offen |
 | 3 Stationen | Stationsassistent, Benzinpreissuche, manuelle Alternative, Partnerfarben, tarifliche Stationsgrenzen | Zweite Station im eigenen Mandanten anlegen, fremde Station bleibt unzugänglich | Offen |
 | 4 Mitarbeiter und Verträge | Fachliche Haupttabs, geschützte Dokumente, Mehrstationszuordnung, separate Zugänge, Vertragsverlauf | Mitarbeiter mit zwei Stationen, Vertragswechsel und Rechteprüfung durchspielen | Offen |
@@ -117,7 +148,7 @@ Phasen sind Lieferabschnitte, keine erfundenen Zeit- oder Kostenzusagen. Billing
 - [x] Neues Repository-Vorgehen bestätigt; bestehender Stand gesichert.
 - [x] Frameworks installiert und exakte Paketversionen festgeschrieben.
 - [x] MySQL-Entwicklungsinstanz und isolierte Testdatenbank eingerichtet und getestet.
-- [ ] Funktionen des Neuaufbaus implementiert oder getestet.
+- [x] Erste Sicherheitsfunktionen implementiert und gegen getrenntes MySQL getestet; fachliche Module noch offen.
 
 ## Offene Entscheidungen vor dem ersten Code
 
@@ -162,10 +193,11 @@ Sicherheitskritische Funktionen, Verträge, Abrechnung und Geräte werden nie du
 | 18.10.2026 | P-003 Registrierung mit vorbereitendem SEPA | Teststart und lesender Ablauf bestätigt; SEPA-Erfassung vor Testbeginn; Kündigung zum bezahlten Periodenende; Landingpage und Registrierung als Mockups v2 überarbeitet | Beide Bildentwürfe visuell auf Kernaussagen geprüft; Dokument-/Dateiverweise geprüft; keine Software-/Banktests | Designabnahme, rechtliche Mandats-/Vertragstexte und konkrete Tarifparameter | Kein neuer Commit oder Push |
 | 18.10.2026 | P-004 IBAN-Rechner und Prüfer | Registrierung v3 und Bauplan um Berechnung/Prüfung ergänzt | Visuelle und Dateikontrolle; keine Software-/Bankprüfung | Bankregeln/Datenquelle und Designabnahme | Kein neuer Commit oder Push |
 | 18.10.2026 | P-005 Vertrag und Superadmin | Zwei neue Bildboards für kostenpflichtigen Abschluss/Kündigung und zentrale Tarif-/Testverwaltung; Bauplan konkretisiert | Beide Bilder visuell geprüft, lokale Verweise kontrolliert; keine funktionalen Vertrags-/Abrechnungstests | Gemeinsame Designabnahme, konkrete Tarifparameter, Stationsassistent sowie Admin-Detailansichten | Kein neuer Commit oder Push |
+| 18.10.2026 | P-011 Mandantentrennung, Rollen und Superadmin | Lokale Zugänge, Firmenmitgliedschaften, Policies, Kontext-/Scope-Basis, getrenntes Plattformpanel, sicherer manueller Bootstrap und deutsche Codekommentare | 53 Standardtests und 1 echter MySQL-Integrationstest grün; HTTP-/CSRF-Prüfung erfolgreich | Tarif-/Testverwaltung, Registrierung, stationsbezogene und sensible Rechte, MFA und weitere Betriebshärtung | Lokal, noch kein Commit/Push für P-011 |
 
 ## Nächster Schritt
 
-Sicherheitsgrundlage mit Mandanten/Rollen/Superadmin aufbauen; erstes fachliches Lieferpaket bleibt Landingpage → Partnerregistrierung mit SEPA/Testphase → Superadmin-Tarife und Abos. Native Einrichtung auf Rechner 2 prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
+Konfigurierbare Tarife und Testdauer im Superadmin auf der getesteten Sicherheitsgrundlage aufbauen; erstes gemeinsames Fachpaket bleibt Landingpage → Partnerregistrierung mit SEPA/Bestätigung/Testphase → Abos. Native Einrichtung auf Rechner 2 und offene Sicherheitsmaßnahmen weiter prüfen. Docker bleibt ausgeschlossen. Keine alten Zugangsdaten übernehmen und keine vorhandene Live-/XAMPP-Datenbank verwenden.
 
 ## Historie des inzwischen erledigten Ordnerwechsels
 

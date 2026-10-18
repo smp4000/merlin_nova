@@ -12,7 +12,7 @@ Sauberer Projektneustart. Stand: 18.10.2026.
 - Neues Git für das bestätigte Repository; natives lokales MySQL 8.4.11 ohne Docker, eigener Port 3307 und eigene Datenverzeichnisse.
 - [Einrichtung und Tests](docs/LOCAL-DEVELOPMENT.md), mit getrennten lokalen Zugangsdaten je Rechner.
 
-Noch keine Loginseite, Testzugänge oder fachlichen Module. Lokale Migrationen und MySQL-Integrationstest sind grün. Phase 1 ist noch nicht abgeschlossen: Mandantentrennung, Rollen, Superadmin, individuelles Designsystem und CI fehlen.
+Lokale Anmeldung, Partner-Mitgliedschaften mit Rollen und ein getrenntes Superadminpanel sind vorhanden. Es gibt keine voreingestellten Zugänge. [Einrichtung des lokalen Superadmins und Rechte-Matrix](docs/LOCAL-DEVELOPMENT.md) beachten. Fachliche Registrierung, Abos und Personalmodule fehlen noch. Phase 1 ist noch nicht abgeschlossen: unter anderem MFA, Designsystem, CI und Prüfung auf Rechner 2 stehen aus.
 
 ## Altstand
 
@@ -22,8 +22,10 @@ Die alten lokalen Konfigurationsdateien enthalten gegebenenfalls Pfade des früh
 
 ## Nächster Abschnitt
 
-Als Nächstes Mandantentrennung, Rollen und Superadmin-Grundlage; anschließend Landingpage, Partnerregistrierung und zentral gesteuerte Test-/Aboverwaltung. Einzelheiten und offene Entscheidungen stehen im Leitfaden.
+Als nächstes Fachpaket folgen Landingpage, Partnerregistrierung und zentral gesteuerte Test-/Aboverwaltung. Offene Sicherheits-/Betriebsarbeiten bleiben im Leitfaden sichtbar; keine Produktivfreigabe.
 
 Der Projektwurzelordner ist für Apache gesperrt. Die spätere Web-Anwendung darf erst mit eigenem vorgesehenem öffentlichen Einstieg gestartet werden, nicht durch Freigabe des gesamten Repositorys.
 
 Die lokale Statusseite läuft auf `http://127.0.0.1:8095`. Sie ist ausdrücklich noch keine Landingpage oder Anmeldemaske.
+
+Anmeldung: `http://127.0.0.1:8095/login`; Plattform: `http://127.0.0.1:8095/superadmin/login`.

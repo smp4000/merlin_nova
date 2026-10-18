@@ -6,3 +6,4 @@
 - Laravel-/Filament-Basis ist freigegeben; fachliche Umsetzung in klar begrenzten Paketen.
 - Automatisch erzeugte Framework-Konfiguration ist keine Freigabe für produktive Dienste, Konten oder Migrationen.
 - Vor Datenbanktests lokale Schutzregeln beachten; ausschließlich die getrennte MySQL-Testdatenbank verwenden.
+- Models, Ressourcen, Policies, Mandantenlogik und andere wichtige Codebereiche ausführlich auf Deutsch kommentieren. Zweck, Zusammenhänge, Sicherheitsgrenzen und das Warum erklären; Kommentare bei Änderungen aktuell halten. Codebezeichner bleiben Englisch.

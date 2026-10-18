@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Partner;
+use App\Models\Station;
+use App\Tenancy\PartnerContext;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
+/**
+ * Technische Lese-/Schreibstrecke für mandantengebundene Stationsnamen.
+ *
+ * PartnerOwnedModel begrenzt Abfragen und Route Binding, StationPolicy
+ * begrenzt Schreibrechte. Beide sind notwendig: Ein korrekter Partner allein
+ * erlaubt einem Leser noch keine Änderung. Die Eingabe enthält nur den Namen;
+ * Partner-ID und Privilegien dürfen nicht vom Browser übernommen werden.
+ * Der Stationsassistent einschließlich Preisabfrage folgt später separat.
+ */
+class StationController extends Controller
+{
+    public function index(): JsonResponse
+    {
+        return response()->json(Station::query()->select(['id', 'name'])->orderBy('id')->paginate(25));
+    }
+
+    public function store(Request $request, PartnerContext $context): JsonResponse
+    {
+        Gate::authorize('create', [Station::class, Partner::findOrFail($context->id())]);
+        $station = Station::create($this->validated($request));
+
+        return response()->json($station->only(['id', 'name']), 201);
+    }
+
+    public function update(Request $request, string $partner, Station $station): JsonResponse
+    {
+        Gate::authorize('update', $station);
+        $station->update($this->validated($request));
+
+        return response()->json($station->only(['id', 'name']));
+    }
+
+    private function validated(Request $request): array
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'partner_id' => ['prohibited'],
+            'role' => ['prohibited'],
+            'is_super_admin' => ['prohibited'],
+        ]);
+
+        return ['name' => $data['name']];
+    }
+}

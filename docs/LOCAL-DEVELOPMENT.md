@@ -18,7 +18,7 @@ Die ignorierte lokale PHP-Laufzeit unter `.runtime/php` wurde aus den Laufzeitda
 2. `pwsh -File scripts/setup-local.ps1` ausführen. Das Skript lädt das offizielle MySQL-8.4.11-Windows-ZIP (rund 268 MB), prüft SHA-256 und Oracle-Signatur und installiert nur unter `.runtime`. Kein Windows-Dienst, kein systemweiter Installer.
 3. Das Skript erzeugt zufällige lokale Geheimnisse, startet eigenes MySQL auf `127.0.0.1:3307`, installiert Abhängigkeiten, migriert nur die Entwicklungsdatenbank und baut das Frontend. Vorhandene Konfiguration wird nicht überschrieben.
 4. Im Ordner `web`: `php artisan serve --host=127.0.0.1 --port=8095`.
-5. `http://127.0.0.1:8095` öffnen. Derzeit nur eine Statusmeldung; keine fertige Landingpage oder Anmeldung.
+5. `http://127.0.0.1:8095` öffnen. Derzeit nur eine Statusmeldung, noch keine fertige Landingpage. Anmeldung unter `/login`, Plattformzugang unter `/superadmin/login`; keine voreingestellten Konten.
 
 Bei Nutzung der vorhandenen lokalen PHP-Laufzeit vorher in PowerShell:
 
@@ -54,17 +54,53 @@ npm ci --ignore-scripts
 npm run build
 ```
 
-Am 18.10.2026: 14 Standardtests grün; separater echter MySQL-Integrationstest mit 3 Assertions grün; Entwicklungsdatenbank erfolgreich migriert. Testmigrationen laufen ausschließlich auf der Testdatenbank. Pint, Composer-Validierung/Audit, npm-Audit und Frontend-Build erfolgreich. Zweiter Rechner noch nicht geprüft.
+Prüfstand P-010: 14 Standardtests und ein separater echter MySQL-Integrationstest grün. P-011 erweitert die Standardtests um echte MySQL-Featuretests für Mandanten, Rollen, Anmeldung und Plattformzugriff; dafür muss nun auch für die Standardsuite das lokale MySQL laufen. Ergebnisse im zentralen Leitfaden. Testmigrationen laufen ausschließlich auf der Testdatenbank. Zweiter Rechner noch nicht geprüft.
 
 Einrichtungsskript zusätzlich praktisch erneut ausgeführt: vorhandene Konfiguration erhalten, keine ausstehenden Migrationen, Installation und Build grün. Statusseite auf Port 8095 mit HTTP 200 geprüft; beide neuen Listener nur auf 127.0.0.1.
 
 Der lokale Guard verwirft fremde Hosts, Standardport 3306, Rootbenutzer, andere Umgebungen, Verbindungs-URLs und Unix-Sockets vor dem Providerstart. Das ist eine lokale Fehlkonfigurationssperre, keine fertige produktive Sicherheitsarchitektur.
 
-## Grenzen
+## Lokalen Superadmin bewusst anlegen
+
+Im Ordner `web`, nach Einrichtung und Migration:
+
+```powershell
+php artisan nova:superadmin admin@example.test --name="Lokale Plattformverwaltung"
+```
+
+Der Befehl fragt das Passwort verdeckt zweimal ab (mindestens 14 Zeichen, Groß-/Kleinbuchstaben, Zahl, Sonderzeichen). Kein Passwort als Kommandozeilenargument und kein Standardpasswort. Ein bereits vorhandenes Konto wird nicht hochgestuft. Die E-Mail-Adresse wird nur für diese ausdrücklich lokale Ersteinrichtung als bestätigt markiert; es wird keine E-Mail versendet. Diese Adresse ist ein Beispiel, nicht ein bereits vorhandener Zugang.
+
+- Plattformanmeldung: `http://127.0.0.1:8095/superadmin/login`.
+- Persönliche Anmeldung: `http://127.0.0.1:8095/login`.
+- Der Superadmin besitzt ohne gesonderte Mitgliedschaft keinen Partnerzugriff.
+- Die öffentliche Registrierung, der E-Mail-Nachweis und Passwort-Reset folgen später. Nicht manuell Firmenrollen aus ungeprüften Requestdaten vergeben.
+
+## Aktuelle Rechte-Matrix
+
+| Zugriff | Inhaber | Verwaltung | Mitarbeiter | Lesend | Superadmin ohne Mitgliedschaft |
+| --- | --- | --- | --- | --- | --- |
+| Eigene freigegebene Firma/Stationsnamen lesen | Ja | Ja | Ja | Ja | Nein |
+| Firmennamen ändern | Ja | Nein | Nein | Nein | Nein |
+| Zugangsliste der Firma lesen | Ja | Nein | Nein | Nein | Nein |
+| Stationsnamen anlegen/ändern | Ja | Ja | Nein | Nein | Nein |
+| Plattformübersicht | Nein | Nein | Nein | Nein | Ja, aktiv und bestätigt |
+| Personen-/Bank-/Dokumentdaten | Noch nicht implementiert | Noch nicht implementiert | Noch nicht implementiert | Noch nicht implementiert | Kein pauschaler Zugriff |
+
+Die Firmenrolle gilt nur für die konkrete aktive Mitgliedschaft. Stationszuordnungen, feinere Fachrechte und Abo-Zugriffszustände kommen später hinzu. Die geschützten JSON-Endpunkte unter `/app/partners/{partner}` sind eine technische Grundlage, kein fertiger Stationsassistent. Sie verwenden Web-Sitzung und CSRF-Schutz, keine öffentliche MDE-API.
+
+## Entwicklungsregeln für neue Mandantendaten
+
+Operative Models von `PartnerOwnedModel` ableiten, eigenen `partner_id`-Fremdschlüssel und explizite erlaubte Schreibfelder definieren. Jede neue Funktion benötigt ihre Policy und negative Zugriffstests. `Partner` und `PartnerMembership` enthalten bewusst die Meta-/Zugriffsgrundlage und sind nicht selbst operativ gescopt: ihre Verwendung muss ausdrücklich autorisiert werden.
+
+Keine rohen SQL-Zugriffe, `withoutGlobalScopes` oder ungeprüften Bulk-Updates in operativen Requestpfaden; solche Zugriffe umgehen Eloquent-Schutzmechanismen. Das ist keine datenbankseitige Row-Level-Security. Jobs erhalten später ausdrücklich geprüfte Kontexte; derzeit existiert dafür noch keine Abnahme. Modelle dürfen keine Sicherheitsannahmen stillschweigend verändern, beispielsweise durch Überschreiben von `booted()` ohne Übernahme des Basisschutzes.
+
+Zweck und Sicherheitsentscheidungen wichtiger Klassen ausführlich auf Deutsch dokumentieren; englische Codebezeichner beibehalten. Klassen-/Methodenkommentare bei Funktionsänderungen aktualisieren.
+
+## Verbleibende Grenzen
 
 - Apache-Zugriff auf die Projektwurzel bleibt gesperrt. Ausschließlich der Loopback-Entwicklungsserver wird verwendet.
 - Keine echten Personen-/Bankdaten, E-Mails, Zahlungsanforderungen, Lastschriften, Geräte- oder Druckerzugriffe.
-- Noch keine Benutzer, Mandantenrechte oder Superadmin-Oberfläche. Filament ist eine installierte Abhängigkeit, kein öffentlich freigeschaltetes Adminpanel.
+- Lokale Anmelde-/Mandanten-/Rollenbasis und Plattformpanel implementiert, aber keine Konten automatisch angelegt. Fachmodule, MFA und weitere Produktivhärtung fehlen; keine Produktivfreigabe.
 - Docker wurde nach Nutzerkorrektur vollständig aus dem neuen Aufbau entfernt. Keine Container angelegt, keine Docker-Reparatur und kein Reset durchgeführt.
 - Microsoft-/Oracle-Laufzeiten bleiben außerhalb von Git. Die MySQL-ZIP-Prüfsumme ist im Installationsskript festgeschrieben; Herstellersignatur des ausgepackten Servers wurde erfolgreich geprüft.
 

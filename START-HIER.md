@@ -5,7 +5,7 @@ Neue, getrennte Entwicklung unter `C:\xampp\htdocs\merlin-nova`.
 - Aktueller roter Faden: [Leitfaden](docs/MERLIN-NOVA-LEITFADEN.md).
 - Einrichtung und Tests auf beiden Rechnern: [Lokale Entwicklung](docs/LOCAL-DEVELOPMENT.md).
 - Anwendung: `web/`, Laravel 13.37.0 und Filament 5.10.2; genaue Abhängigkeiten in Lockdateien.
-- Noch keine Partnerregistrierung, Anmeldung oder Abrechnung. Mockups sind Entwürfe.
+- Anmeldung, Rollen-/Mandantenbasis und Superadmin-Grundlage vorhanden; keine Partnerregistrierung oder Abrechnung. Mockups sind Entwürfe, keine fertige Oberfläche.
 - Natives MySQL ohne Docker ist eingerichtet; Migrationen und Integrationstest sind grün.
 - Altarchiv und Livesystem bleiben unverändert. Niemals die alte `.env` übernehmen.
 
