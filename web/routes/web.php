@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PartnerController;
@@ -11,14 +12,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('home');
+Route::get('/register', [RegistrationController::class, 'show'])->name('register');
 
 Route::middleware('guest')->group(function () {
+    Route::post('/register', [RegistrationController::class, 'store'])->middleware('throttle:5,1');
     Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:10,1');
 });
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
-Route::get('/email/verify', fn () => response('Bitte zuerst die E-Mail-Adresse bestätigen. Der Bestätigungsversand folgt mit der Partnerregistrierung.', 403))
-    ->middleware('auth')->name('verification.notice');
+Route::get('/email/verify', [RegistrationController::class, 'notice'])
+    ->middleware(['auth', RequireActiveUser::class])->name('verification.notice');
+Route::post('/email/verification-notification', [RegistrationController::class, 'resend'])
+    ->middleware(['auth', RequireActiveUser::class, 'throttle:3,1'])->name('verification.send');
+Route::get('/email/verify/{id}/{hash}', [RegistrationController::class, 'verify'])
+    ->middleware(['auth', RequireActiveUser::class, 'signed', 'throttle:6,1'])->name('verification.verify');
 
 Route::middleware(['auth', RequireActiveUser::class, 'verified'])->group(function () {
     Route::get('/app', function (Request $request) {

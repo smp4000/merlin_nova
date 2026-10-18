@@ -98,7 +98,7 @@ class LandingPageTest extends TestCase
             ->assertSee('Zum Inhalt springen')->assertSee('aria-label="Hauptnavigation"', false)
             ->assertSee('id="kostenlos-testen"', false)->assertSee('id="tarife"', false)
             ->assertSee('noindex, nofollow')->assertSee(route('login'), false)
-            ->assertDontSee('<form', false)->assertSee('Die Partnerregistrierung folgt als Nächstes.');
+            ->assertDontSee('<form', false)->assertSee('Die Testkonfiguration folgt als Nächstes.');
     }
 
     public function test_mockup_layout_uses_local_assets_and_a_clearly_labelled_fictional_app_preview(): void

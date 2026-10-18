@@ -23,11 +23,23 @@ class Partner extends Model
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['is_active' => 'boolean', 'trial_started_at' => 'immutable_datetime', 'trial_ends_at' => 'immutable_datetime'];
     }
 
     public function memberships(): HasMany
     {
         return $this->hasMany(PartnerMembership::class);
+    }
+
+    /**
+     * Registrierte Firmen dürfen operativ nur während ihres bestätigten Tests
+     * schreiben. Am zugesagten Endzeitpunkt greift Nur-Lesen ohne Cronjob.
+     * Ältere technische Fixtures ohne Registrierung bleiben unverändert;
+     * ein bezahlter Vertragsstatus wird erst im späteren Abo-Modul ergänzt.
+     */
+    public function allowsOperationalWrites(): bool
+    {
+        return $this->registration_owner_id === null
+            || ($this->trial_started_at !== null && $this->trial_ends_at !== null && now()->lt($this->trial_ends_at));
     }
 }

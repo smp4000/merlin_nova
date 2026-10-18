@@ -19,7 +19,7 @@ class StationPolicy
 {
     public function create(User $user, Partner $partner): bool
     {
-        return in_array($user->roleFor($partner), [PartnerRole::Owner, PartnerRole::Manager], true);
+        return $partner->allowsOperationalWrites() && in_array($user->roleFor($partner), [PartnerRole::Owner, PartnerRole::Manager], true);
     }
 
     public function update(User $user, Station $station): bool

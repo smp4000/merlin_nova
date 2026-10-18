@@ -1,0 +1,36 @@
+/* Gleiche Petrol-/Türkis-Grundlage wie die Landingpage. Bewusst normale
+   HTML-Formulare: Pflichtfelder bleiben auch ohne JavaScript bedienbar. */
+.registration-body { background: #f3f7fa; }
+.registration-main { padding-block: 38px 60px; }
+.registration-main > h1 { font-size: clamp(28px, 3vw, 43px); }
+.registration-intro { color: var(--muted); margin-bottom: 28px; }
+.registration-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 28px; align-items: start; }
+.registration-form { display: grid; gap: 20px; }
+.registration-card { border: 1px solid var(--line); border-radius: 10px; background: white; padding: 28px; }
+.registration-card h2 { font-size: 24px; }
+.card-heading { display: flex; gap: 16px; align-items: center; margin-bottom: 18px; }
+.card-heading h2 { margin-bottom: 4px; font-size: 21px; }
+.card-heading p { color: var(--muted); margin: 0; font-size: 13px; }
+.registration-form label:not(.check) { display: block; font-size: 13px; font-weight: 650; margin: 16px 0 6px; }
+.registration-form input:not([type=checkbox]) { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid #bacbd6; border-radius: 6px; background: white; }
+.registration-form input:focus-visible { outline: 3px solid #a8dce2; border-color: var(--teal); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.registration-form small { display: block; color: var(--muted); margin-top: 6px; font-size: 12px; }
+.local-warning { background: #eaf5f7; border-left: 3px solid var(--teal); padding: 13px 16px; font-size: 13px; }
+.local-warning p { margin: 5px 0 0; }
+.check { display: flex; align-items: start; gap: 12px; margin: 20px 0; font-size: 13px; cursor: pointer; }
+.check input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 3px; accent-color: var(--teal); }
+.declaration { padding: 16px; border: 1px solid var(--line); border-radius: 6px; background: #f9fbfd; font-size: 12px; margin-top: 18px; }
+button.button { border: 0; cursor: pointer; font: inherit; font-size: 14px; }
+.registration-summary h2 { margin: 20px 0 12px; }
+.registration-summary ul { padding-left: 20px; color: var(--muted); }
+.registration-summary li { margin-block: 12px; }
+.form-errors { color: #882828; background: #fff4f4; border: 1px solid #dfb6b6; border-radius: 6px; padding: 18px; font-size: 13px; }
+.iban-status { font-size: 12px; color: var(--teal-dark); margin: 6px 0; }
+.confirmation { max-width: 900px; margin-block: 50px; }
+.confirmation h1 { font-size: 32px; }
+.confirmation p { font-size: 14px; color: var(--muted); }
+.logout-form { margin-top: 24px; }
+.logout-form button { background: none; border: 0; text-decoration: underline; cursor: pointer; color: var(--muted); }
+@media(max-width: 850px) { .registration-layout { grid-template-columns: 1fr; } .registration-summary { grid-row: 1; } }
+@media(max-width: 520px) { .form-grid { grid-template-columns: 1fr; gap: 0; } .registration-card { padding: 20px; } .registration-main { padding-top: 25px; } }

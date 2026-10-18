@@ -23,7 +23,7 @@ class PartnerPolicy
 
     public function update(User $user, Partner $partner): bool
     {
-        return $user->roleFor($partner) === PartnerRole::Owner;
+        return $user->roleFor($partner) === PartnerRole::Owner && $partner->allowsOperationalWrites();
     }
 
     public function manageMembers(User $user, Partner $partner): bool

@@ -30,6 +30,7 @@ class ResolvePartner
             abort_unless(ctype_digit($identifier), 404);
             $partner = Partner::findOrFail($identifier);
             abort_unless(Gate::allows('view', $partner), 404);
+            abort_if(! $request->isMethodSafe() && ! $partner->allowsOperationalWrites(), 403, 'Der Test ist noch nicht gestartet oder abgelaufen. Der Zugriff ist nur lesend.');
             $context->set($partner);
 
             return $next($request);

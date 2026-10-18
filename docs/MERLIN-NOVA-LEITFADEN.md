@@ -2,7 +2,29 @@
 
 Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwechsel.
 
-## Aktueller Arbeitsstand P-014: Landingpage nach freigegebenem Mockup
+## Aktueller Arbeitsstand P-015: Lokale Partnerregistrierung
+
+18.10.2026: Landingpage zuerst als `8a2b561` nach `origin/main` gepusht und Remote-Hash geprüft. Anschließend Registrierung im gleichen Türkis-/Petroldesign lokal umgesetzt. Auf Nutzerauftrag wird P-015 samt Einstiegskorrektur nach erneuter Prüfung als eigenes Paket committet und regulär gepusht; Ergebnis/Hash im Übergabebericht. Aktualisierungsanleitung für den bereits eingerichteten zweiten Rechner in `LOCAL-DEVELOPMENT.md` ergänzt. Keine lokalen Konten, Schlüssel oder Datenbanken übertragen.
+
+### Umgesetzt
+
+- `/register`: Firmendaten, persönlicher Zugang und vorbereitende SEPA-Erfassung. Ohne konfigurierte Testregeln kein Start; angebotene Dauer und Stationslimit werden bei Registrierung als Zusage festgeschrieben. Geänderte Regeln erfordern ein neues Formular.
+- Transaktionale Anlage von Partner, unbestätigtem Benutzer, Owner-Mitgliedschaft und vorbereitetem Mandat. Wiederholte gleiche Formularübermittlung erzeugt keine zweiten Datensätze; abweichende Wiederholung und Übernahme bestehender Konten werden abgelehnt.
+- Bankdaten verschlüsselt gespeichert und nicht in Serialisierung, Fehlerrückgaben oder Formular-Wiederbefüllung ausgegeben. Allgemeine IBAN-Längen-/Format-/MOD97-Prüfung serverseitig und als Eingabehilfe; keine Zusage zur Existenz, Inhaberschaft oder Lastschriftfähigkeit des Kontos.
+- Signierter, kontogebundener Bestätigungslink mit 60 Minuten Gültigkeit; Testbeginn erst nach Bestätigung. Wiederholung verlängert den Test nicht. Versand ausschließlich in lokale Log-/Array-Transporter, keine echten E-Mails.
+- Nach Ablauf lesender Zugriff, schreibende Partner-/Stationsrouten und Policies gesperrt. Stationsanlage beachtet das zugesagte Limit mit Transaktion und Partnersperre.
+- Entwicklungsdatenbank ausschließlich lokal migriert; bestehende Adminzugänge und Tarif-/Testkonfiguration nicht überschrieben.
+
+### Prüfungen und Grenzen
+
+- Nachtrag Registrierungseinstieg: Gastschutz leitete angemeldete Besucher beim Klick auf „Kostenlos testen“ still weg. GET `/register` zeigt nun eine Erklärung zum parallelen Test im privaten Browserfenster, ohne Sitzung oder Konto zu verändern. POST bleibt gastgeschützt. Regressionstest einschließlich gesperrter Anlage unter bestehender Sitzung ergänzt; danach 126 Standardtests mit 452 Assertions grün, Pint erfolgreich.
+- 125 Standardtests mit 439 Assertions sowie ein separater echter MySQL-Integrationstest mit 3 Assertions grün. Abgedeckt sind unter anderem atomare Anlage, Mandantenzuordnung, Verschlüsselung, ungültige Eingaben, Wiederholungen, fremde/abgelaufene/manipulierte Bestätigungslinks, SMTP-Sperre, Ablauf und Stationslimit.
+- Abschließend gesamte Testsuite erneut grün, Pint-Prüfung, JavaScript-Syntaxprüfung und Frontend-Build erfolgreich. Lokaler GET `/register` liefert HTTP 200; Git-Diff ohne Whitespacefehler. Keine vollständige interaktive Browserabnahme des neuen Formulars durchgeführt.
+- Vorbereitetes SEPA ist ausdrücklich ein lokaler Entwurf, nicht zum Einzug freigegeben. Gläubigerdaten, rechtlich abgestimmtes Mandat, Bankfreigabe, Zahlungsabschluss, Rechnungen und Kündigungsablauf fehlen weiterhin. Keine automatische kostenpflichtige Verlängerung.
+- Noch offen: verifizierter nationaler BLZ-/Kontonummer-zu-IBAN-Rechner, produktiver Mailbetrieb, Datenschutz-/Aufbewahrungs-/Löschkonzept, Missbrauchsschutz für öffentlichen Betrieb, MFA, vollständige Browser-/Desktop-/Barrierefreiheitsprüfung und echte Mehrprozesslasttests. Keine DSGVO- oder Sicherheitszertifizierung behauptet.
+- Nächster Schritt: lokalen Registrierungsablauf mit erfundenen Daten gemeinsam abnehmen; danach Partnerbereich und Stationsassistent. Keine echten Bank-/Personaldaten für diese Vorschau verwenden. Docker, Livesystem und Altarchiv bleiben unangetastet.
+
+## Vorheriger Arbeitsstand P-014: Landingpage nach freigegebenem Mockup
 
 18.10.2026: Lokale Landingpage auf ausdrücklichen Auftrag an die Nutzervorlage angepasst; Rückmeldung „sehr gut“. Türkis/Petrol, dunkelblauer Text, Tankstellenmotiv, Stations-App-Vorschau, dreistufiger Einstieg und kompakte Funktionskarten ersetzen die zuvor zu weit abweichende Gestaltung. Die positive Rückmeldung bestätigt die Designrichtung, nicht eine Produktiv-/Sicherheitsabnahme.
 
@@ -18,7 +40,7 @@ Stand: 18.10.2026. Verbindlicher Einstieg für Planung, Umsetzung und Rechnerwec
 
 Offen bleibt die echte Partnerregistrierung mit vorbereitendem SEPA, E-Mail-Nachweis und festgeschriebenem Teststart; keine Kostenpflicht oder Abbuchung durch diese Seite. Rechtstexte und Produktivhärtung bleiben eigene Abnahmepunkte. Docker, Livesystem und Altarchiv unverändert.
 
-Nächster Schritt: Partnerregistrierung auf dieser bestätigten Designrichtung aufbauen. Git: Landingpage-Arbeitsstand weiterhin lokal, noch nicht zusätzlich committet/gepusht; letzter gesicherter Stand bleibt `6843792`.
+Git-Nachtrag: Landingpage als `8a2b561` committet und nach `origin/main` gepusht. Registrierung folgt in P-015.
 
 ## Vorheriger Arbeitsstand P-013: Landingpage „Klar & ruhig“
 

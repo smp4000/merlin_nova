@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Kostenlos registrieren · Merlin Nova</title><link rel="stylesheet" href="{{ asset('css/nova-landing.css') }}"><link rel="stylesheet" href="{{ asset('css/nova-registration.css') }}"><script src="{{ asset('js/nova-registration.js') }}" defer></script></head>
+<body class="registration-body"><a class="skip" href="#main">Zum Inhalt springen</a>
+<header class="site-header"><div class="wrap navigation"><a class="brand" href="{{ route('home') }}"><span class="brand-mark">M</span><strong>Merlin Nova</strong></a><div class="nav-actions"><span>Schon dabei?</span><a href="{{ route('login') }}">Anmelden</a></div></div></header>
+<main class="wrap registration-main" id="main"><p class="eyebrow">Partner → Stationen → Mitarbeiter</p><h1>Ihr klarer Start mit Merlin Nova.</h1><p class="registration-intro">Erst kostenlos kennenlernen. Keine automatische Kostenpflicht.</p>
+@if (!$policy)<div class="registration-card"><h2>Testbedingungen werden vorbereitet.</h2><p>Die Testdauer und das Stationslimit müssen zuerst im Superadmin freigegeben werden. Bitte später erneut versuchen.</p><a href="{{ route('home') }}">Zur Startseite</a></div>
+@else
+<div class="registration-layout"><form action="{{ route('register') }}" method="post" class="registration-form">
+    @csrf<input type="hidden" name="form_token" value="{{ session('registration_form.token') }}">
+    @if ($errors->any())<div class="form-errors" role="alert"><strong>Bitte die Angaben prüfen.</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <section class="registration-card"><div class="card-heading"><span class="step-number">1</span><div><h2>Ihr Betrieb</h2><p>Die Firma bildet Ihren getrennten Partnerbereich.</p></div></div>
+        <label for="company-name">Firmenname</label><input id="company-name" name="company_name" value="{{ old('company_name') }}" autocomplete="organization" required maxlength="255">
+        <label for="street">Straße und Hausnummer</label><input id="street" name="street" value="{{ old('street') }}" autocomplete="street-address" required maxlength="255">
+        <div class="form-grid"><div><label for="postal-code">Postleitzahl</label><input id="postal-code" name="postal_code" value="{{ old('postal_code') }}" autocomplete="postal-code" required maxlength="20"></div><div><label for="city">Ort</label><input id="city" name="city" value="{{ old('city') }}" autocomplete="address-level2" required maxlength="255"></div></div>
+        <label for="country">Ländercode der Anschrift</label><input id="country" name="country" value="{{ old('country', 'DE') }}" autocomplete="country" pattern="[A-Z]{2}" maxlength="2" required aria-describedby="country-help"><small id="country-help">Zwei Großbuchstaben, z. B. DE für Deutschland oder AT für Österreich.</small>
+    </section>
+    <section class="registration-card"><div class="card-heading"><span class="step-number">2</span><div><h2>Ihr persönlicher Zugang</h2><p>Sie erhalten die Inhaberrolle, keine Plattform-Administratorrechte.</p></div></div>
+        <label for="contact-name">Vor- und Nachname</label><input id="contact-name" name="contact_name" value="{{ old('contact_name') }}" autocomplete="name" required maxlength="255">
+        <label for="email">E-Mail-Adresse</label><input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required maxlength="255">
+        <div class="form-grid"><div><label for="password">Passwort</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="14" maxlength="255" required aria-describedby="password-help"></div><div><label for="password-confirmation">Passwort wiederholen</label><input id="password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="14" maxlength="255" required></div></div><small id="password-help">Mindestens 14 Zeichen, Groß-/Kleinbuchstaben, Zahl und Sonderzeichen.</small>
+    </section>
+    <section class="registration-card"><div class="card-heading"><span class="step-number">3</span><div><h2>SEPA vorbereiten</h2><p>Keine Abbuchung im kostenlosen Test.</p></div></div>
+        <div class="local-warning"><strong>Lokaler Mandatsentwurf – noch nicht zum Einzug freigegeben.</strong><p>Gläubigerdaten und endgültiger Mandatstext fehlen noch. Bitte ausschließlich synthetische Testdaten verwenden.</p></div>
+        <label for="account-holder">Kontoinhaber</label><input id="account-holder" name="account_holder" autocomplete="off" required maxlength="255">
+        <label for="iban">IBAN</label><input id="iban" name="iban" autocomplete="off" spellcheck="false" maxlength="64" required data-country-lengths="{{ json_encode($ibanLengths) }}" aria-describedby="iban-status iban-help"><p id="iban-status" class="iban-status" role="status"></p><small id="iban-help">Formale Länder-/Längen-/Prüfzifferprüfung, keine Bestätigung von Konto, Kontoinhaber oder Lastschriftfähigkeit. Bankwerte werden bei Formularfehlern nicht erneut angezeigt.</small>
+        <details><summary>IBAN-Rechner und Bankregeln</summary><p>Bitte die IBAN Ihrer Bank übernehmen. Ein BLZ-/Kontonummer-Rechner wird erst mit geprüften nationalen Sonderregeln ergänzt; eine pauschale Berechnung wäre nicht verlässlich.</p></details>
+        <p class="declaration">{{ $declaration }}</p>
+        <label class="check"><input type="checkbox" name="sepa_accepted" value="1" required><span>Ich bestätige die vorbereitende SEPA-Erfassung als lokalen Mandatsentwurf. Dadurch entsteht kein kostenpflichtiger Vertrag.</span></label>
+        <label class="check"><input type="checkbox" name="test_accepted" value="1" required><span>Ich möchte {{ $policy->duration_days }} Tage mit bis zu {{ $policy->station_limit }} Station(en) kostenlos testen. Der Zeitraum beginnt nach E-Mail-Bestätigung. Ohne ausdrücklichen Aboabschluss bleibt der Zugang nach Ablauf nur lesend.</span></label>
+        <button class="button primary" type="submit">Kostenlosen Partnerzugang anlegen <span aria-hidden="true">→</span></button>
+    </section>
+</form><aside class="registration-summary registration-card"><span class="trial-pill">Kostenloser Test</span><h2>{{ $policy->duration_days }} Tage kennenlernen.</h2><p>Bis zu {{ $policy->station_limit }} Station(en).</p><ul><li>Start erst nach E-Mail-Bestätigung.</li><li>Keine Abbuchung im Test.</li><li>Keine automatische Kostenpflicht.</li><li>Bankdaten verschlüsselt gespeichert.</li></ul><p class="quiet">Lokaler Funktionsversuch, keine Produktivregistrierung. Datenschutzhinweise, Vertragstexte und Gläubigerangaben müssen vor Veröffentlichung fertiggestellt und geprüft werden.</p></aside></div>
+@endif
+</main></body></html>

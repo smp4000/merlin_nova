@@ -125,6 +125,36 @@ Landingpage-Prüfstand P-013: 94 Standardtests plus ein echter MySQL-Integration
 - Docker wurde nach Nutzerkorrektur vollständig aus dem neuen Aufbau entfernt. Keine Container angelegt, keine Docker-Reparatur und kein Reset durchgeführt.
 - Microsoft-/Oracle-Laufzeiten bleiben außerhalb von Git. Die MySQL-ZIP-Prüfsumme ist im Installationsskript festgeschrieben; Herstellersignatur des ausgepackten Servers wurde erfolgreich geprüft.
 
+## Lokale Registrierung prüfen (P-015)
+
+### Bereits eingerichteten zweiten Rechner aktualisieren
+
+Den lokalen Artisan-Webserver mit Strg+C beenden, dann in PowerShell 7 ausführen:
+
+```powershell
+cd "C:\xampp\htdocs\merlin-nova"
+git status --short
+git pull --ff-only
+& .\scripts\start-mysql.ps1
+& .\scripts\nova.cmd artisan migrate
+& .\scripts\nova.cmd artisan optimize:clear
+& .\scripts\nova.cmd vendor/bin/phpunit
+& .\scripts\nova.cmd vendor/bin/phpunit tests/Integration/MySqlConnectionTest.php
+& .\scripts\nova.cmd artisan serve --host=127.0.0.1 --port=8095
+```
+
+Bei lokalen Git-Änderungen oder einem Fehler stoppen und prüfen, nicht zurücksetzen oder Daten löschen. Jeden Befehl erst nach erfolgreichem Abschluss des vorherigen ausführen. Dieses Paket verändert keine Lockdateien und benötigt nach der bereits erfolgreichen Ersteinrichtung kein erneutes Composer-/npm-Installieren. Die Migration ergänzt die eigene Entwicklungsdatenbank; kein `migrate:fresh`, kein neues APP_KEY und keine Übertragung von `.env`, Datenbank oder Bestätigungslinks zwischen Rechnern. Bestehende lokale Adminzugänge bleiben erhalten. Testregeln und Tarife werden je Rechner separat im Superadmin verwaltet.
+
+1. Landingpage öffnen und „Kostenlos testen“ wählen oder `http://127.0.0.1:8095/register` aufrufen. Dafür abgemeldet sein oder ein privates Browserfenster verwenden; bestehende Adminzugänge nicht ersetzen.
+2. Ausschließlich erfundene Firmen-/Personendaten und öffentliche IBAN-Testbeispiele verwenden. Mindestens 14 Zeichen langes Testpasswort wählen. Die SEPA-Erklärung ist ein lokaler, nicht zum Einzug freigegebener Entwurf.
+3. Nach Absenden den zuletzt erzeugten Bestätigungslink in der ignorierten Datei `web/storage/logs/laravel.log` lesen. Dieser Link ist geheim wie ein Zugangstoken: nicht weitergeben, veröffentlichen oder einchecken. Keine echte E-Mail wird versandt.
+4. Link innerhalb von 60 Minuten im angemeldeten Testkonto öffnen. Bei Anmeldung aus einem anderen Fenster wird nach Login zum Link zurückgeleitet. Erst die Bestätigung startet den Test mit den bei Registrierung zugesagten Regeln.
+5. Im Partnerbereich Status prüfen. Wiederholte Bestätigung verlängert nichts. Nach Ablauf bleiben Lesezugriffe bestehen; Änderungen werden abgewiesen. Ablauf-, Quoten- und Sicherheitsfälle über die isolierten Tests prüfen, nicht durch Manipulation bestehender Entwicklungsdaten.
+
+Bankdaten werden mit Laravel-Verschlüsselung und lokalem `APP_KEY` gespeichert. Verlust oder Austausch des Schlüssels macht diese Werte unlesbar; Datenbank und Schlüssel müssen später getrennt und geschützt gesichert werden. Keine Schlüssel nach Git kopieren. Es gibt noch keine produktive Schlüsselrotation oder Wiederherstellungsabnahme.
+
+Die IBAN-Prüfung unterstützt die im Code gelisteten Länder und prüft allgemeine Länge, Format und MOD97, nicht alle nationalen BBAN-/Bankregeln. Ein zuverlässiger BLZ-Rechner bleibt offen. Quelle: [SWIFT IBAN Registry, Release 101](https://www.swift.com/sites/default/files/files/iban-registry-v101.pdf). Gläubiger-ID und freigegebener Mandatstext sind vor echtem Einzug erforderlich; siehe [Bundesbank: Gläubiger-Identifikationsnummer](https://www.bundesbank.de/de/aufgaben/unbarer-zahlungsverkehr/serviceangebot/sepa/glaeubiger-identifikationsnummer/allgemeine-hinweise-602858). Diese Implementierung ersetzt keine rechtliche oder bankfachliche Freigabe.
+
 ## Quellen
 
 - [Offizielles MySQL-8.4-Windows-ZIP](https://dev.mysql.com/downloads/mysql/8.4.html)

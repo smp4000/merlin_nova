@@ -23,7 +23,7 @@ use Illuminate\Notifications\Notifiable;
  * Ein Superadmin erhält insbesondere keinen globalen Policy-Bypass.
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'registration_token_hash', 'registration_payload_hash'])]
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     protected $attributes = ['is_active' => true, 'is_super_admin' => false];

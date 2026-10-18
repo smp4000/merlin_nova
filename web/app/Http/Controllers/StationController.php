@@ -7,7 +7,9 @@ use App\Models\Station;
 use App\Tenancy\PartnerContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Technische Lese-/Schreibstrecke für mandantengebundene Stationsnamen.
@@ -28,7 +30,18 @@ class StationController extends Controller
     public function store(Request $request, PartnerContext $context): JsonResponse
     {
         Gate::authorize('create', [Station::class, Partner::findOrFail($context->id())]);
-        $station = Station::create($this->validated($request));
+        $data = $this->validated($request);
+        // Derselbe Partner wird vor jeder Anlage gesperrt: parallele Anfragen
+        // dürfen das zugesagte Test-Stationslimit nicht gemeinsam überschreiten.
+        $station = DB::transaction(function () use ($context, $data): Station {
+            $partner = Partner::lockForUpdate()->findOrFail($context->id());
+            Gate::authorize('create', [Station::class, $partner]);
+            if ($partner->registration_owner_id !== null && Station::count() >= $partner->trial_station_limit) {
+                throw ValidationException::withMessages(['station_limit' => 'Das Stationslimit Ihres kostenlosen Tests ist erreicht.']);
+            }
+
+            return Station::create($data);
+        }, attempts: 3);
 
         return response()->json($station->only(['id', 'name']), 201);
     }
