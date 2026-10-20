@@ -49,6 +49,25 @@ final class Iban implements ValidationRule
         return $remainder === 1;
     }
 
+    /**
+     * Nur formaler deutscher Standardvorschlag. Institutsindividuelle Umrechnungen
+     * werden hier ausdrücklich nicht behauptet; vor Verwendung Bankunterlagen prüfen.
+     * Kontonummer bleibt Text, damit führende Nullen nicht verloren gehen.
+     */
+    public static function germanProposal(string $blz, string $account): ?string
+    {
+        if (! preg_match('/^\d{8}$/D', $blz) || ! preg_match('/^\d{1,10}$/D', $account)) {
+            return null;
+        }
+        $bban = $blz.str_pad($account, 10, '0', STR_PAD_LEFT);
+        $remainder = 0;
+        foreach (str_split($bban.'131400') as $digit) {
+            $remainder = ($remainder * 10 + (int) $digit) % 97;
+        }
+
+        return 'DE'.str_pad((string) (98 - $remainder), 2, '0', STR_PAD_LEFT).$bban;
+    }
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! self::valid($value)) {
