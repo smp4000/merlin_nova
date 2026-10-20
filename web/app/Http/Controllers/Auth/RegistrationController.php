@@ -7,25 +7,26 @@ use App\Http\Controllers\Controller;
 use App\Notifications\RegistrationVerification;
 use App\Registration\PartnerRegistration;
 use App\Rules\Iban;
+use App\Support\RegistrationMail;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
  * Lokaler Registrierungseinstieg mit serverseitig gebundenem Formularschlüssel.
  * Nach dem Anlegen ist der Benutzer angemeldet, aber noch nicht bestätigt.
- * Echte Mailtransporte sind für dieses Paket gesperrt. Bankwerte werden weder
+ * SMTP wird ausschließlich über die freigegebenen Plattformsettings aktiviert.
+ * Bankwerte werden weder
  * in Antworten noch Fehlermeldungen/alten Formulareingaben wieder ausgegeben.
  */
 class RegistrationController extends Controller
 {
-    private function requireLocalMail(): void
+    private function requireMailAvailability(): void
     {
-        $mailer = config('mail.default');
-        abort_unless(app()->environment(['local', 'testing'])
-            && in_array(config("mail.mailers.{$mailer}.transport"), ['log', 'array'], true), 503, 'Registrierung nur mit lokalem Mailprotokoll freigegeben.');
+        app(RegistrationMail::class)->ensureAvailable();
     }
 
     public function show(Request $request, BillingCatalog $catalog)
@@ -37,19 +38,19 @@ class RegistrationController extends Controller
             return response()->view('auth.registration-session')->header('Cache-Control', 'private, no-store');
         }
 
-        $this->requireLocalMail();
+        $this->requireMailAvailability();
         $policy = $catalog->activeTrialPolicy();
         if ($policy) {
             $request->session()->put('registration_form', ['token' => bin2hex(random_bytes(32)), 'policy_id' => $policy->id]);
         }
 
-        return response()->view('auth.register', ['policy' => $policy, 'declaration' => PartnerRegistration::DECLARATION, 'ibanLengths' => Iban::LENGTHS], $policy ? 200 : 503)
+        return response()->view('auth.register', ['policy' => $policy, 'declaration' => PartnerRegistration::DECLARATION, 'ibanLengths' => Iban::LENGTHS, 'smtpEnabled' => app(RegistrationMail::class)->usesSmtp()], $policy ? 200 : 503)
             ->header('Cache-Control', 'private, no-store');
     }
 
     public function store(Request $request, PartnerRegistration $registration)
     {
-        $this->requireLocalMail();
+        $this->requireMailAvailability();
         $form = $request->session()->get('registration_form');
         if (! $form || ! is_string($request->input('form_token')) || ! hash_equals($form['token'], $request->input('form_token'))) {
             throw ValidationException::withMessages(['registration' => 'Das Formular ist abgelaufen. Bitte die Registrierung neu laden.']);
@@ -64,27 +65,40 @@ class RegistrationController extends Controller
         Auth::login($result['user']);
         $request->session()->regenerate();
         if ($result['created']) {
-            // Keine Standard-Registered-Listener auslösen, die einen fremden Mailweg
-            // nachrüsten könnten. Die Nachricht hat hier einen expliziten lokalen Weg.
-            $result['user']->notify(new RegistrationVerification);
+            // Die Registrierung ist bereits atomar gespeichert. Ein SMTP-Ausfall
+            // darf keinen zweiten Partner erzeugen oder den Test vorzeitig starten.
+            // Keine Transportdetails protokollieren; sie können Geheimnisse enthalten.
+            try {
+                $result['user']->notify(new RegistrationVerification);
+            } catch (TransportExceptionInterface) {
+                return redirect()->route('verification.notice')->with('status_type', 'error')->with('status', 'Ihr Zugang wurde angelegt, die Bestätigungsmail konnte aber nicht versendet werden. Bitte später erneut anfordern.');
+            }
         }
 
-        return redirect()->route('verification.notice')->with('status', 'Die Bestätigungsnachricht wurde im lokalen Mailprotokoll abgelegt.');
+        return redirect()->route('verification.notice')->with('status', app(RegistrationMail::class)->usesSmtp()
+            ? 'Die Bestätigungsnachricht wurde an den Mailserver übergeben. Bitte auch den Spamordner prüfen.'
+            : 'Die Bestätigungsnachricht wurde im lokalen Mailprotokoll abgelegt.');
     }
 
     public function notice()
     {
-        return response()->view('auth.verify-email')->header('Cache-Control', 'private, no-store');
+        return response()->view('auth.verify-email', ['smtpEnabled' => app(RegistrationMail::class)->usesSmtp()])->header('Cache-Control', 'private, no-store');
     }
 
     public function resend(Request $request)
     {
-        $this->requireLocalMail();
+        $this->requireMailAvailability();
         if (! $request->user()->hasVerifiedEmail()) {
-            $request->user()->notify(new RegistrationVerification);
+            try {
+                $request->user()->notify(new RegistrationVerification);
+            } catch (TransportExceptionInterface) {
+                return back()->with('status_type', 'error')->with('status', 'Die Bestätigungsmail konnte nicht versendet werden. Bitte später erneut versuchen.');
+            }
         }
 
-        return back()->with('status', 'Falls noch erforderlich, wurde eine neue Bestätigungsnachricht im lokalen Mailprotokoll abgelegt.');
+        return back()->with('status', app(RegistrationMail::class)->usesSmtp()
+            ? 'Falls noch erforderlich, wurde eine neue Bestätigungsnachricht an den Mailserver übergeben. Bitte auch den Spamordner prüfen.'
+            : 'Falls noch erforderlich, wurde eine neue Bestätigungsnachricht im lokalen Mailprotokoll abgelegt.');
     }
 
     public function verify(EmailVerificationRequest $request, PartnerRegistration $registration)
