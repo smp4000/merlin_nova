@@ -1,8 +1,58 @@
 # Lokale Entwicklung ohne Docker
 
-Stand: 18.10.2026. Ausschließlich neue lokale Umgebung, kein Deployment.
+Standabgleich: 20.10.2026, P-069. Ausschließlich neue lokale Umgebung, kein Deployment. Aktueller Funktionsumfang und offene Grenzen: [Status](planung/STATUS.md). Die folgenden Bedien-/Einrichtungsangaben und Prüfberichte stammen aus früheren Arbeitspaketen; heute keine Dienste, Installation oder Tests ausgeführt. Spätere Fortschreibungen haben Vorrang.
+
+## Ein-Klick-Start auf diesem Rechner
+
+Die Desktop-Verknüpfung **Merlin Nova** startet über PowerShell 7 `scripts/start-nova.ps1`. Sie verwendet ausschließlich die vorhandene lokale Einrichtung, startet nötige Nova-Prozesse im Hintergrund und öffnet nach Bereitschaft `http://127.0.0.1:8095/` im Standardbrowser. Laufende eigene Dienste werden wiederverwendet. Kein XAMPP-Apache, kein Docker, keine Adminrechte und kein dauerhaft offenes Terminal erforderlich. Fehler erscheinen als Dialog; Webserverprotokolle liegen ignoriert unter `.local/launcher/`. Die Verknüpfung ist rechnerlokal und wird nicht eingecheckt.
+
+## Chefpflege und Mitarbeiter-Papierkorb (P-047)
+
+Als Inhaber in der Mitarbeiterliste „Bearbeiten“ wählen. Persönliche Stammdaten, Arbeitgeberangaben, E-Mail-Empfänger, Station und Personalnummer können auch nach der Bestätigung geändert werden. Der Personalbogen lässt sich über „Personalfragebogen wechseln“ neu anzeigen; erst Speichern übernimmt ihn. Änderungsgrund und Bestätigung der Zugangssperre angeben. Keine automatische Mail; anschließend bei Bedarf gesondert neu einladen. Private Altentwürfe werden nicht zum neuen Empfänger übernommen.
+
+„Löschen“ öffnet die Bestätigung für den Papierkorb. Erst nach Checkbox/Absenden wird die Akte ausgeblendet; gespeicherte Inhalte und Prüfhistorie bleiben erhalten. „Papierkorb öffnen“ ermöglicht das Wiederherstellen. Alte Einladungslinks/Sitzungen bleiben gesperrt; bereits vergebene Personalnummern bleiben reserviert. Nach Testende Fachänderungen gesperrt. Additive Migration `2026_10_19_200000_add_employee_trash` auf diesem Rechner angewendet; beim Rechnerwechsel regulär migrieren. Keine endgültige Löschung/automatische Aufbewahrung in diesem Paket.
+
+## Selbstauskunft-Assistent und IBAN (P-045)
+
+Die aktivierte Mitarbeitereinladung zeigt sechs Schritte mit Zurück/Weiter, direkter Schrittauswahl, Entwurf speichern und abschließender Übersicht. Weiter speichert nicht; nach erfolgreichem Entwurfsspeichern bleibt der Schritt erhalten. Einreichen erfordert die ausdrückliche Bestätigung. Fehler öffnen den betroffenen Schritt. Ohne JavaScript sind sämtliche Gruppen untereinander nutzbar; Serverprüfung bleibt aktiv.
+
+IBAN-Hinweise werden beim Eingeben lokal berechnet, keine Bank/API-Anfrage. Geprüft werden das vorhandene unterstützte Länderformat, Länge und Prüfziffer. Kleinschreibung/Leerzeichen werden normalisiert. „Formal gültig“ bestätigt keine Kontoexistenz oder Inhaberschaft. In der Übersicht werden IBAN und Steuer-/SV-Nummern gekürzt; zum Prüfen den jeweiligen Schritt öffnen. Browserprüfungen nur mit synthetischer Null-Kontonummer in der getrennten Testdatenbank, keine echte Bankangabe verwenden.
+
+## Echter Einladungsversand geprüft (P-044)
+
+Am 19.10.2026 auf ausdrücklichen Nutzerauftrag genau eine echte Einladung für die vorhandene fehlgeschlagene Akte über den regulären Fachservice versendet. SMTP-Übergabe erfolgreich, neuer Einladungsstatus `ready`, keine Fehlerkategorie. Keine Mail-/Passwort-/.env-Änderung erforderlich; historische Störung nicht reproduziert. Posteingang und Spamordner muss der Empfänger prüfen. Der neue Link ersetzt bisherige Links/Sitzungen und bleibt als lokale Nova-Adresse nur auf diesem Rechner nutzbar. Keine Zustellung ins Postfach allein aus SMTP-Annahme ableiten.
+
+## Einladungsfehler und Meldungen (P-043)
+
+Nach einem Versandfehler Mitarbeiterakte neu öffnen. Empfänger bestätigen und bewusst erneut senden; keine automatische Wiederholung. Meldung nennt eine feste Fehlerkategorie, der letzte Fehlstatus bleibt in der Akte. Alte Fehler ohne Kategorie sind nachträglich nicht genauer bestimmbar. Fehlender SMTP-Zugang wird im Superadmin vervollständigt; vorhandene Konfiguration wird nicht durch die Diagnose geändert. Eine Serverannahme bestätigt noch keinen Posteingang. Lokale Diagnose am 19.10.: Verbindung/TLS/Anmeldung/SMTP-Empfängerprüfung erfolgreich, keine echte Nachricht gesendet; historische Ursache und tatsächliche Zustellung bleiben offen. Additive Migration `2026_10_19_190000_add_invitation_delivery_error` in Nova-Dev angewendet. Gemeinsame schließbare Status-/Fehlermeldungen im Partnerbereich und der Selbstauskunft.
+
+## Mitarbeiteranlage und Selbstauskunft (P-042)
+
+Im Partnerbereich als Inhaber „Mitarbeiter“ öffnen, „Mitarbeiter anlegen“ wählen und ausschließlich fiktive lokale Prüfdaten verwenden. Name, E-Mail-Empfänger, Stammstation und Personalbogen angeben. Die Voranlage sendet noch nichts. In der Akte Empfänger prüfen/bestätigen und „Per E-Mail einladen“ verwenden; vorhandene Superadmin-Mailkonfiguration gilt auch hier, keine neue .env nötig. Bei Log-Mail steht der synthetische Link im lokalen Mailprotokoll; bei aktivem SMTP erfolgt die ausdrückliche Versandaktion an den eingegebenen Empfänger. Keine echten Empfänger für Tests verwenden. Die aktuelle Loopback-Adresse ist nur auf diesem Rechner erreichbar; ein tatsächlich externer Mitarbeiterzugang braucht später eine gesondert freigegebene HTTPS-Bereitstellung.
+
+Einladung sieben Tage gültig; Link genau einmal in eine Browsersitzung aktivieren. Danach in derselben noch gültigen Sitzung öffnen, zwischenspeichern und einreichen. Bei Verlust/anderem Browser neu einladen; alte Links und Sitzungen werden ungültig, Entwurf bleibt für denselben Empfänger erhalten. Nach Einreichung Akte beim Inhaber neu laden, Arbeitgeberdaten ergänzen, gegebenenfalls zurückfragen, erneut einreichen lassen und abschließend bestätigen. Keine DATEV-Übertragung oder Benutzerrechtevergabe. Bestätigte Akte war in P-042 lesend; die spätere ausdrückliche Inhaberpflege P-047 erlaubt Änderungen mit Zugangssperre und neuer Prüffassung (siehe oben).
+
+Migration `2026_10_19_180000_create_employee_onboarding` auf diesem Rechner bereits in Nova-Dev angewendet; nach Rechnerwechsel regulär mit eigener Nova-Laufzeit migrieren. Tests ausschließlich `merlin_nova_test`; Browserprüfung auf eigenem 8097 mit Log-Mail. Aktuelle offene Datenschutz-/Recovery-/Rollen-/Exportgrenzen vor echter Personalerfassung im Leitfaden P-042 beachten.
 
 ## Voraussetzungen auf beiden Rechnern
+
+### Benzinpreisanbindung (P-034)
+
+P-035: Nach Aktualisierung der Quelle „Öffnungszeiten und Koordinaten prüfen“ wählen, Quellwerte ansehen, gewünschte Datenarten auswählen und bestätigen. Nur leere Wochentage und ein vollständig leeres Koordinatenpaar werden ergänzt. Manuelle Angaben bleiben erhalten. Bei Neuanlage ist die Auswahl in Schritt 3 möglich. Mehrfachintervalle und Feiertagsangaben werden angezeigt, aber nicht automatisch übertragen.
+
+„Ort ermitteln“ im Such- oder manuellen Adressformular fragt Nominatim erst nach Klick für eine vollständige deutsche PLZ ab. Bestehenden Ort bewusst leeren, wenn eine neue Ermittlung gewünscht ist. OSM-Attribution sichtbar, keine PLZ-Mittelpunkte als Stationskoordinaten. Keine Autocomplete-Abfragen beim Tippen; moderater Betrieb, gemeinsamer lokaler Rate-Limiter und Cache. Betreiber können `NOVA_POSTAL_ENDPOINT` auf einen kompatiblen HTTPS-Endpunkt setzen oder zum Abschalten leeren; bestehende `.env` wurde nicht verändert. Bei Skalierung öffentlichen Dienst und gemeinsames Rate-Limit neu bewerten. Siehe [Nominatim-Regeln](https://operations.osmfoundation.org/policies/nominatim/).
+
+Im Stationsassistenten optional deutsche PLZ und Ort eingeben und „Stationen suchen“ wählen. Treffer prüfen, Anschrift bestätigen und erst am Ende Station anlegen. Bereits bestehende Stationen lassen sich unter „Stammdaten“ → „Benzinpreisanbindung einrichten“ bewusst zuordnen; deren manuelle Daten werden nicht überschrieben. Danach aktualisiert „Benzinpreise aktualisieren“ ausschließlich die getrennte Quellenansicht. Abrufe nur auf Knopfdruck, Detailcache fünf Minuten, Suchcache 15 Minuten. Nicht verfügbare/alte Preise werden entsprechend angezeigt. Keine Schlüssel oder `.env`-Änderung nötig.
+
+Öffentliche HTML-Seiten von Benzinpreis-Aktuell.de, keine garantierte API. Auf ausdrücklichen Nutzerauftrag technisch aktiviert; es liegt keine gesonderte Anbieter-Nutzungsfreigabe vor und es wurde keine Anfrage versendet. Weitere Grenzen und tatsächliche Prüfungen im Leitfaden P-034. Nach Rechnerwechsel die additive Migration regulär mit der eigenen Nova-PHP-Laufzeit ausführen; keine Archivkonfiguration übernehmen.
+
+### STRATO-Mailversand (P-022)
+
+Die Superadminseite `http://127.0.0.1:8095/superadmin/email` erlaubt ausdrücklich aktivierten Registrierungsversand über `smtp.strato.de:465` mit direktem TLS oder seit P-024 Port 587 mit verpflichtendem STARTTLS. Mit bestehendem Superadmin anmelden, Benutzername/Absender prüfen, Passwort verdeckt eingeben, SMTP aktivieren und speichern. Danach kann ausdrücklich eine Testmail an die gespeicherte Absenderadresse ausgelöst werden. Partnerkonten haben keinen Zugriff. Ohne Aktivierung bleibt der lokale Log-/Arrayweg erhalten; `.env` muss dafür nicht verändert werden.
+
+Das Passwort liegt verschlüsselt in der eigenen lokalen Datenbank, wird niemals zurück ins Formular geladen und beim Leerlassen erhalten. Nicht im Chat oder Repository hinterlegen. Datenbank-Backup und Anwendungsschlüssel schützen; eine Neuinstallation benötigt ihr eigenes Passwort. Registrierung bleibt bei Mailausfall unbestätigt, mit erneuter Versandmöglichkeit. Bestätigungslinks zeigen weiterhin auf localhost und müssen auf dem Nova-Rechner mit dem zugehörigen Konto geöffnet werden. SMTP-Annahme allein beweist keine Postfachzustellung. Historischer Ausgangsstand P-022: Zustellung damals noch offen. P-024/P-025 dokumentieren später erfolgreichen Versand und eine vom Nutzer gezeigte Bestätigungsmail; keine erneute Zustellprüfung in P-069.
+
+P-023: Für die eigene Windows-PHP-Laufzeit kann `scripts/prepare-mail-ca.ps1` ein Mozilla-CA-Bündel von curl.se mit SHA-256-Prüfung unter `.local/mail/ca-bundle.pem` vorbereiten. Dieses gilt ausschließlich für den lokalen Nova-SMTP-Stream; keine globale PHP-/Windows-Konfiguration und kein Abschalten von Zertifikatsprüfungen. Beim Rechnerwechsel bei Bedarf separat vorbereiten. Am aktuellen Rechner aktiviert und geprüft, SMTP-TLS-Handshake endet dennoch mit Timeout; erfolgreiche Postfachzustellung weiterhin offen. Testmailseite unterscheidet nun TLS-, Timeout- und Anmeldefehler ohne Ausgabe von Server-/AUTH-Details.
 
 - Git, PowerShell 7, PHP ab 8.4.1 mit Composer 2 (aktueller lokaler Stand: 8.4.26). Die gepinnten Abhängigkeiten benötigen mindestens 8.4.1; XAMPP-PHP 8.2 ist nicht ausreichend. Erweiterungen: curl, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, sodium, zip; PHPUnit zusätzlich DOM/XML.
 - Node.js ab 22.12 mit npm. Abhängigkeiten werden aus Lockdateien installiert.
@@ -160,3 +210,37 @@ Die IBAN-Prüfung unterstützt die im Code gelisteten Länder und prüft allgeme
 - [Offizielles MySQL-8.4-Windows-ZIP](https://dev.mysql.com/downloads/mysql/8.4.html)
 - [Offizielle Windows-Installationshinweise](https://dev.mysql.com/doc/refman/8.4/en/windows-installation.html)
 - [Offizieller Quellcode des gepinnten Windows-Shutdown-Ereignisses](https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/mysqld.cc)
+
+## Partnerbereich und Stationsassistent (P-016)
+
+Nach Anmeldung unter `/app` die eigene Firma auswählen. Die Partnerübersicht zeigt Testende (Europe/Berlin), zugesagtes Stationslimit und vorhandene Stationen. Inhaber und Verwaltung können während des aktiven Tests „Station anlegen“ wählen; andere Rollen sowie abgelaufene Tests bleiben lesend. Grunddaten, Anschrift und Zusammenfassung mit erfundenen Daten prüfen. Die optionale externe Suche ist bis zur Anbieter-/Bedingungsklärung nicht angebunden; manuelle Anlage benötigt keine API. Erst die ausdrückliche Bestätigung speichert.
+
+Für dieses Paket nach Übernahme der Dateien ausschließlich `scripts/nova.cmd artisan migrate` aus der Projektwurzel ausführen; bestehende Konten/Konfiguration erhalten. Kein `migrate:fresh`, kein neues APP_KEY, keine Paketinstallation erforderlich. Prüfstand und verbleibende Abnahmen stehen im Leitfaden unter P-016. Dieses Paket wurde auf Nutzerwunsch noch nicht committet/gepusht.
+
+## Stationsstammdaten im festgelegten Design (P-020)
+
+In der Partnerübersicht führt „Stammdaten“ an einer Station zur neuen Detailmaske. Inhaber und Verwaltung sehen allgemeine Details, während Stationsbank-/Steuerdaten ausschließlich Inhabern vorbehalten bleiben. Mitarbeiter/Leser erhalten keine Detail-/Bild-/Finanzsicht. Nach Testablauf bleiben autorisierte Details lesbar; Bearbeiten/Uploads sind gesperrt.
+
+Beim Übernehmen dieses Pakets `scripts/nova.cmd artisan migrate` aus der Projektwurzel ausführen. Die additive Migration ergänzt optionale Hausnummer und verschlüsselte Profile mit Partner-/Stations-FK; keine bestehenden Straßenzeilen/Konten/Testregeln zurücksetzen und keinen neuen APP_KEY erzeugen. Der bestehende Schlüssel wird nun auch für die Stationsprofile benötigt. Private JPG-/PNG-Bilder liegen unter `web/storage/app/private/station-media/`, niemals unter Public-Disk; vorhandene Bilder und Schlüssel nicht ungefragt übertragen/einchecken.
+
+Bankkonten sind nur manuelle Stammdaten ohne Zahlung oder neues Mandat. Ausschließlich öffentliche IBAN-Testbeispiele verwenden. Es gibt keine Bankabfrage/IBAN-Berechnung und keine aktive Preis-/Geocoding-/Kartenanbindung. Neue Bankeingaben werden nach Fehlern nicht wiederbefüllt; gespeicherte Werte bleiben geschützt erhalten. Auswahlfelder mit fehlendem Quellkatalog zunächst als Text, Geräte-/Mitarbeiterbeziehungen weiterhin offen. Prüfungen, Grenzen und nächste Abnahme im Leitfaden P-020.
+# Private Mitarbeiter-Nachweise (P-048)
+
+Neue Dateien liegen verschlüsselt unter `web/storage/app/employee-documents`, nicht im öffentlichen Storage. Keine Symlinks oder Webserverfreigaben dafür anlegen. Dateiinhalt und Dateiname benötigen denselben bestehenden Anwendungsschlüssel; den Schlüssel weder ändern noch ausgeben. Die beiden additiven P-048-Migrationen ergänzen Auswahltexte und Dateimetadaten. Tests verwenden eine eigene Ablage unter `storage/framework/testing/employee-documents` und die vorhandene Testdatenbank.
+
+Uploads: JPEG/PNG/PDF bis 2 MiB, keine Gesundheitsunterlagen. QR-Handyzugang derzeit nur gesperrter UI-Einstieg plus Planungsentwurf; erst mit freigegebener HTTPS-Adresse als Upload-only-Einmalübergabe implementieren/freischalten. Keine lokale Netzwerk-/Firewallfreigabe nötig oder vorgenommen. Physische Kamera, Malware-Scan und endgültige Aufbewahrungs-/Löschregeln sind offen. Lokal versionierte Bankreferenz gilt bis 06.12.2026; danach ist die automatische Bank-/BIC-Ergänzung gesperrt, bis die Quelle geprüft erneuert wird.
+# Wettbewerb/Karten (P-053)
+
+Additive Migration `2026_10_19_230000_create_station_competitors` ergänzt ausschließlich die getrennte Wettbewerbsablage. Leaflet 1.9.4 liegt mit Lizenz lokal unter `web/public/lib/leaflet-1.9.4`; kein npm-/CDN-Laufzeitbezug. `station_map.php` enthält die austauschbare Kacheladresse, Standard `https://tile.openstreetmap.org/{z}/{x}/{y}.png`. Keine lokale .env-Änderung. Erst „OpenStreetMap laden“ erzeugt Kachelanfragen; Origin-Referrer und Attribution erhalten, Browsercache nicht umgehen, keine Offline-/Vorabkacheln. Automatisierte Browserprüfungen ausschließlich gegen ignorierte lokale Testkacheln ausführen, keine OSM-Server durch Test-Pan/Zoom belasten.
+
+Wettbewerbersuche verwendet die bestätigte bestehende Quelle Benzinpreis-Aktuell.de mit gewünschtem Stationsradius 2–25 km. Echtdatenkorrektur P-054: Die Quelle bestätigt nur Stufen 3/5/10/20 km, beliebige Werte fallen sonst still auf 5 km zurück. Nova verwendet passende unterstützte Stufen und prüft den Radius in der Quellüberschrift. 21–25 km sind nicht vollständig abgedeckt; der Hinweis muss sichtbar bleiben. Keine automatische Abrufserie je Treffer. Übernahme nach Einzelvorschau/Bestätigung; öffentliches HTML ist kein stabiler API-Vertrag. Die technische Aktivierung klärt Anbieter-Nutzungsrechte nicht. Echte Karten-/Quellprüfung für ARAL Fulda ist in P-054 dokumentiert; Produktionskartenanbieter bleibt gesondert offen.
+
+## Automatische Wettbewerbsprüfung und geschlossene Stationspreise (P-060)
+
+Nach Wettbewerbersuche Entfernungen nacheinander prüfen lassen; „Prüfung anhalten“ pausiert, „Entfernungsprüfung fortsetzen“ setzt bewusst fort. Bei Quellfehler oder Abrufgrenze bleibt die Serie stehen, keine automatische Wiederholung. Während der Prüfung keine Auswahl; danach oder nach Pause nur innerhalb des Radius liegende Treffer mit gültigen Koordinaten auswählen. Fehlende eigene Koordinaten zuerst unter Allgemein pflegen. Mehr als die Anbieterquote kann nicht in einer Serie abgefragt werden; Grenzen werden nicht hochgesetzt.
+
+Karte lädt automatisch beim Öffnen des Kartenbereichs. Für geschlossene Stationen „Benzinpreise aktualisieren“ verwenden: falls die Quelle passende strukturierte Stationspreise liefert, erscheinen diese als zuletzt bekannt ohne behaupteten Preiszeitpunkt. Andere Datenquellen oder regionale Durchschnitte werden nicht eingesetzt. Bereits früher bekannte Preise bleiben bei leeren Abrufen erhalten. Neue Parserfassung verwendet eigenen Cache v5; keine .env-Änderung nötig.
+
+## Alle Benzinpreise aktualisieren (P-064)
+
+In den Stationsstammdaten „Alle Benzinpreise aktualisieren“ wählen. Erst die eigene Anbindung, danach die gespeicherten Quell-Wettbewerber werden automatisch nacheinander aktualisiert. Seite offen lassen; Fortschritt wird angezeigt. „Anhalten“ pausiert, „Aktualisierung fortsetzen“ setzt bewusst fort. Ohne JavaScript jeden Schritt per Button auslösen. Bei Quellfehler/Abrufgrenze stoppt der Lauf und bisherige Erfolge bleiben gespeichert. Quellen mit noch gültigem Detailcache verwenden denselben Stand statt erzwungenem Neuabruf. Der Lauf gilt fünfzehn Minuten; danach neu starten. Manuelle Preisangaben bleiben erhalten. Kein geplanter oder unbeaufsichtigter Aktualisierungsdienst.

@@ -1,6 +1,6 @@
 # Merlin Nova Bauplan Web App und SaaS
 
-Stand: 18.10.2026. Fachlicher und technischer Plan, noch keine implementierte neue Anwendung. Fortschritt im [Leitfaden](../MERLIN-NOVA-LEITFADEN.md).
+Standabgleich: 20.10.2026, P-069. Fachlicher und technischer Gesamtplan mit teilweise lokal implementierten Bereichen: Landingpage, Registrierung/Teststart, Tarifkatalog sowie Stations- und Mitarbeitergrundlagen. Bezahlter Aboabschluss, Abrechnung und weitere Betriebsprozesse bleiben offen. Aktueller Umfang und Grenzen im [Status](../planung/STATUS.md), historische Umsetzung und Prüfungen im [Leitfaden](../MERLIN-NOVA-LEITFADEN.md).
 
 ## Drei klar getrennte Oberflächen
 
@@ -98,6 +98,8 @@ Die vorliegende alte XML-Beispieldatei dient nur zur fachlichen Strukturreferenz
 **Abnahme:** XSD- und Geschäftsregelprüfung, Summen-/Anzahlkontrolle, Mandat widerrufen/fehlend, doppelte Forderung, Storno, Rücklastschrift und angenommener Import in einem freigegebenen Banktestprozess. Kein echter Lastschrifteinzug während lokaler Entwicklung.
 
 ## W06 Station anlegen als Assistent
+
+Ergänzung 18.10.2026: Der Nutzer hat das vollständige GasStation-Model und einen BenzinpreisService als Daten-/Integrationsreferenz geliefert. Feldzuordnung, Fachgrenzen, Servicebefunde und offene Entscheidungen stehen im [Stations-Blueprint](STATIONS.md). Dieser erweiterte Datenbedarf ist noch keine implementierte Resource oder Freigabe des externen Scrapers.
 
 Gestaltungsgrundlage: [Suche und Datenprüfung](mockups/station-wizard-search-v2.png), [Partnerfarbe und Abschluss](mockups/station-wizard-finish-v2.png). Grundgestaltung am 18.10.2026 vom Nutzer positiv bestätigt; dies ist noch keine technische Implementierung oder Abnahme. Der Assistent läuft im kostenlosen Test ohne kostenpflichtigen Aboabschluss. Farbwerte sind markennahe Vorschläge, keine Zusage offizieller Markenrichtlinien. Die gewünschte Farbe verändert keine gespeicherte Marke.
 

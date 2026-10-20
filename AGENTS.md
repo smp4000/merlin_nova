@@ -3,7 +3,7 @@
 - Dies ist der saubere Neuaufbau. Das vollständige lokale Altprojekt liegt unter `C:\xampp\htdocs\merlin-nova_archiv` und wird nicht verändert oder ungeprüft übernommen.
 - Das Livesystem, produktive Datenbanken, Geräte und Druckagenten bleiben unangetastet.
 - Vor jedem Arbeitspaket `docs/MERLIN-NOVA-LEITFADEN.md` lesen. Nach jedem Schritt Umsetzung, tatsächliche Prüfungen, Lücken, nächsten Schritt und gegebenenfalls Commit-/Push-Stand dort aktualisieren.
-- Laravel und Filament liegen unter `web/`; natives MySQL ohne Docker unter `scripts/`. Anmeldung, Mandanten-/Rollenbasis und ein getrenntes Superadmin-Panel sind lokal implementiert. Fachliche Registrierung, Abos und Personalmodule sind noch offen. Tatsächliche Prüfungen stehen im Leitfaden.
+- Laravel und Filament liegen unter `web/`; natives MySQL ohne Docker unter `scripts/`. Anmeldung, Mandanten-/Rollenbasis und ein getrenntes Superadmin-Panel sind lokal implementiert. Partnerregistrierung sowie lokale Stations- und Mitarbeitergrundlagen sind implementiert; kostenpflichtiger Aboabschluss, Abrechnung und weiterführende Personalmodule bleiben offen. Aktueller Überblick: `docs/planung/STATUS.md`; tatsächliche frühere Prüfungen stehen im Leitfaden.
 - Docker ist auf Nutzerwunsch ausgeschlossen. Kein Containerbetrieb, kein Dockerstart und keine Docker-Reparatur für dieses Projekt.
 - Beschlossene Richtung: aktuelle stabile kompatible Laravel-/Filament-Versionen, MySQL und individuelles ruhiges Design statt unverändertem Filament-Standard. Versionen vor Installation prüfen und festschreiben.
 - Erstes Lieferpaket: Landingpage, Partnerregistrierung und Superadmin-gesteuerte Tarife/Testphase/Abos. Details und Abnahme in `docs/planning/WEB-APP.md`.
