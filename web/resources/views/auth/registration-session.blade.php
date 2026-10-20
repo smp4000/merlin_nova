@@ -15,7 +15,13 @@
     <h1>Sie sind bereits angemeldet.</h1>
     <section class="registration-card">
         <p>Die Partnerregistrierung erstellt einen neuen, getrennten Zugang. Ihr bestehendes Konto bleibt unverändert.</p>
-        <h2>Registrierung parallel testen</h2>
+        <form method="post" action="{{ route('logout') }}">
+            @csrf
+            <input type="hidden" name="next" value="register">
+            <button class="button primary" type="submit">Abmelden und Partner registrieren</button>
+        </form>
+        <p>Sie werden abgemeldet und gelangen direkt zum Registrierungsformular. Ihr vorhandener Partnerbereich bleibt erhalten.</p>
+        <h2>Alternativ parallel registrieren</h2>
         <p>Öffnen Sie ein privates Browserfenster und rufen Sie dort diese Adresse auf:</p>
         <p><a href="{{ route('register') }}">{{ route('register') }}</a></p>
         <p>So bleiben Sie hier angemeldet und können dort einen neuen Partner registrieren.</p>

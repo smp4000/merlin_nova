@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
+use App\Models\Station;
 use App\Tenancy\PartnerContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Schmaler HTTP-Einstieg zur Überprüfung der Partner-Sicherheitsgrundlage.
+ * Autorisierte Partnerübersicht und schmale technische Partner-Endpunkte.
  *
- * Diese Endpunkte sind noch kein fertiges Partnerportal. Der Kontext wird
+ * Die HTML-Übersicht ergänzt die bestehenden JSON-Endpunkte. Der Kontext wird
  * ausschließlich durch ResolvePartner aufgebaut; Firmenänderungen und die
  * personenbezogene Zugangsliste brauchen zusätzliche eigene Policy-Rechte.
  * Explizite Feldlisten verhindern, dass spätere sensible Modellfelder
@@ -19,6 +20,18 @@ use Illuminate\Support\Facades\Gate;
  */
 class PartnerController extends Controller
 {
+    /** Liefert nur Stationen des durch Middleware autorisierten Partnerkontexts. */
+    public function overview(PartnerContext $context)
+    {
+        $partner = Partner::findOrFail($context->id());
+
+        return view('partner.overview', [
+            'partner' => $partner,
+            'stations' => Station::orderBy('name')->paginate(20),
+            'stationCount' => Station::count(),
+        ]);
+    }
+
     public function show(PartnerContext $context): JsonResponse
     {
         return response()->json(Partner::findOrFail($context->id())->only(['id', 'name']));

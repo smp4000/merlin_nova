@@ -6,6 +6,7 @@ use App\Billing\BillingCatalog;
 use App\Enums\PartnerRole;
 use App\Models\Partner;
 use App\Models\PartnerMembership;
+use App\Models\PlatformMailSetting;
 use App\Models\SepaMandate;
 use App\Models\User;
 use App\Notifications\RegistrationVerification;
@@ -16,10 +17,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 /**
@@ -37,12 +40,29 @@ class PartnerRegistrationTest extends TestCase
         $this->actingAs($user)->get('/register')->assertOk()
             ->assertSee('Sie sind bereits angemeldet.')
             ->assertSee('privates Browserfenster')
+            ->assertSee('Abmelden und Partner registrieren')
             ->assertDontSee('name="form_token"', false);
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseCount('partners', 0);
         $this->post('/register', $this->data())->assertRedirect();
         $this->assertAuthenticatedAs($user);
         $this->assertDatabaseCount('partners', 0);
+    }
+
+    public function test_explicit_logout_opens_registration_and_invalidates_the_session(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->withSession(['private_marker' => 'old-session'])
+            ->post('/logout', ['next' => 'register'])->assertRedirect('/register')
+            ->assertSessionMissing('private_marker');
+        $this->assertGuest();
+    }
+
+    public function test_logout_does_not_allow_an_arbitrary_redirect(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->post('/logout', ['next' => 'https://example.test'])->assertRedirect('/login');
+        $this->assertGuest();
     }
 
     private function policy(int $days = 14, int $stations = 2)
@@ -80,6 +100,15 @@ class PartnerRegistrationTest extends TestCase
         $this->get('/register')->assertServiceUnavailable()->assertSee('Testbedingungen werden vorbereitet.');
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('partners', 0);
+    }
+
+    public function test_registration_explains_local_mail_before_collecting_data(): void
+    {
+        $this->policy();
+        $this->get('/register')->assertOk()
+            ->assertSee('kein Versand an Ihr Postfach.')
+            ->assertSee('web/storage/logs/laravel.log')
+            ->assertSee('ausschließlich fiktive Daten');
     }
 
     public function test_registration_creates_one_unverified_owner_and_encrypted_prepared_mandate(): void
@@ -230,6 +259,30 @@ class PartnerRegistrationTest extends TestCase
         $this->get('/register')->assertServiceUnavailable();
         $this->post('/register', $this->data())->assertServiceUnavailable();
         $this->assertDatabaseCount('partners', 0);
+    }
+
+    public function test_smtp_failure_keeps_one_unverified_partner_and_allows_later_resend(): void
+    {
+        $this->policy();
+        (new PlatformMailSetting)->forceFill([
+            'id' => 1, 'username' => 'smtp@example.test', 'from_address' => 'smtp@example.test',
+            'from_name' => 'Merlin Test', 'password' => 'Synthetic-Only!42', 'enabled' => true,
+        ])->save();
+        $this->get('/register')->assertOk()->assertSee('E-Mail-Bestätigung per STRATO aktiviert.')->assertDontSee('kein Versand an Ihr Postfach');
+        Mail::shouldReceive('purge')->with('nova_registration');
+        $transport = \Mockery::mock();
+        Mail::shouldReceive('mailer')->with('nova_registration')->andReturn($transport);
+        $transport->shouldReceive('send')->andThrow(new TransportException('SECRET-SMTP-DETAIL'));
+        $response = $this->post('/register', [...$this->data(), 'form_token' => session('registration_form.token')]);
+        $response->assertRedirect('/email/verify')->assertSessionHas('status', 'Ihr Zugang wurde angelegt, die Bestätigungsmail konnte aber nicht versendet werden. Bitte später erneut anfordern.');
+        $user = User::where('email', 'partner@example.test')->sole();
+        $this->assertAuthenticatedAs($user);
+        $this->assertFalse($user->hasVerifiedEmail());
+        $this->assertDatabaseCount('partners', 1);
+        $this->assertNull(Partner::sole()->trial_started_at);
+        Notification::fake();
+        $this->post('/email/verification-notification')->assertRedirect();
+        Notification::assertSentTo($user, RegistrationVerification::class);
     }
 
     public function test_resend_is_authenticated_and_contains_no_bank_data(): void

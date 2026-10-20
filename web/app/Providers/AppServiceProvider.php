@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Stations\Providers\BenzinpreisProvider;
+use App\Stations\Providers\StationDataProvider;
 use App\Support\LocalEnvironment;
 use App\Tenancy\PartnerContext;
 use Illuminate\Support\Facades\Gate;
@@ -27,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
             ...config('database.connections.mysql'),
         ]);
         $this->app->scoped(PartnerContext::class);
+        // Nutzerinitiierter Adapter auf ausdrücklichen Auftrag. Anbieterrechte
+        // bleiben gesonderter Prüfbedarf; kein automatisches Hintergrundpolling.
+        $this->app->bind(StationDataProvider::class, BenzinpreisProvider::class);
     }
 
     /**
@@ -35,5 +40,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('manage-billing', fn (User $user): bool => $user->is_active && $user->is_super_admin && $user->hasVerifiedEmail());
+        Gate::define('manage-mail', fn (User $user): bool => $user->is_active && $user->is_super_admin && $user->hasVerifiedEmail());
     }
 }

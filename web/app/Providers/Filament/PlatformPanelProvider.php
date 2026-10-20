@@ -3,7 +3,9 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\BillingSettings;
+use App\Filament\Pages\MailSettings;
 use App\Filament\Pages\PlatformOverview;
+use App\Http\Middleware\RequireActiveUser;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -37,7 +39,7 @@ class PlatformPanelProvider extends PanelProvider
             ->colors(['primary' => Color::Blue])
             ->defaultThemeMode(ThemeMode::Light)->darkMode(false)
             ->maxContentWidth(Width::Full)->font(null)
-            ->pages([PlatformOverview::class, BillingSettings::class])
+            ->pages([PlatformOverview::class, BillingSettings::class, MailSettings::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -49,6 +51,6 @@ class PlatformPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([Authenticate::class], isPersistent: true);
+            ->authMiddleware([Authenticate::class, RequireActiveUser::class], isPersistent: true);
     }
 }

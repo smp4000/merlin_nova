@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Kostenlos registrieren · Merlin Nova</title><link rel="stylesheet" href="{{ asset('css/nova-landing.css') }}"><link rel="stylesheet" href="{{ asset('css/nova-registration.css') }}"><script src="{{ asset('js/nova-registration.js') }}" defer></script></head>
-<body class="registration-body"><a class="skip" href="#main">Zum Inhalt springen</a>
+<body class="registration-body">
+@include('shared.notifications')<a class="skip" href="#main">Zum Inhalt springen</a>
 <header class="site-header"><div class="wrap navigation"><a class="brand" href="{{ route('home') }}"><span class="brand-mark">M</span><strong>Merlin Nova</strong></a><div class="nav-actions"><span>Schon dabei?</span><a href="{{ route('login') }}">Anmelden</a></div></div></header>
 <main class="wrap registration-main" id="main"><p class="eyebrow">Partner → Stationen → Mitarbeiter</p><h1>Ihr klarer Start mit Merlin Nova.</h1><p class="registration-intro">Erst kostenlos kennenlernen. Keine automatische Kostenpflicht.</p>
 @if (!$policy)<div class="registration-card"><h2>Testbedingungen werden vorbereitet.</h2><p>Die Testdauer und das Stationslimit müssen zuerst im Superadmin freigegeben werden. Bitte später erneut versuchen.</p><a href="{{ route('home') }}">Zur Startseite</a></div>
 @else
 <div class="registration-layout"><form action="{{ route('register') }}" method="post" class="registration-form">
     @csrf<input type="hidden" name="form_token" value="{{ session('registration_form.token') }}">
+    @if (!$smtpEnabled)<div class="local-warning"><strong>Lokaler Registrierungstest – kein Versand an Ihr Postfach.</strong><p>Bitte ausschließlich fiktive Daten verwenden. Die Bestätigungsnachricht wird in <code>web/storage/logs/laravel.log</code> abgelegt. Der Link daraus muss mit dem neu angelegten Konto geöffnet werden; erst dann startet der Test.</p></div>@else<div class="local-warning"><strong>E-Mail-Bestätigung per STRATO aktiviert.</strong><p>Sie erhalten einen Bestätigungslink an Ihre angegebene E-Mail-Adresse. Der Link führt zurück auf diese lokale Nova-Kopie. Bitte weiterhin ausschließlich fiktive Betriebs- und Bankdaten verwenden.</p></div>@endif
     @if ($errors->any())<div class="form-errors" role="alert"><strong>Bitte die Angaben prüfen.</strong><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <section class="registration-card"><div class="card-heading"><span class="step-number">1</span><div><h2>Ihr Betrieb</h2><p>Die Firma bildet Ihren getrennten Partnerbereich.</p></div></div>
         <label for="company-name">Firmenname</label><input id="company-name" name="company_name" value="{{ old('company_name') }}" autocomplete="organization" required maxlength="255">

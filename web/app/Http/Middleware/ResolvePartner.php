@@ -30,7 +30,10 @@ class ResolvePartner
             abort_unless(ctype_digit($identifier), 404);
             $partner = Partner::findOrFail($identifier);
             abort_unless(Gate::allows('view', $partner), 404);
-            abort_if(! $request->isMethodSafe() && ! $partner->allowsOperationalWrites(), 403, 'Der Test ist noch nicht gestartet oder abgelaufen. Der Zugriff ist nur lesend.');
+            // Der eng benannte Widerruf beendet ausschließlich einen Personalzugang.
+            // Die Inhaberprüfung folgt zusätzlich im Controller/Fachservice;
+            // weder Personalpflege noch Versand werden dadurch wieder freigegeben.
+            abort_if(! $request->isMethodSafe() && ! $partner->allowsOperationalWrites() && ! $request->routeIs('employees.revoke'), 403, 'Der Test ist noch nicht gestartet oder abgelaufen. Der Zugriff ist nur lesend.');
             $context->set($partner);
 
             return $next($request);

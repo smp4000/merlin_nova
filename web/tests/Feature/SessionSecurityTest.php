@@ -13,7 +13,7 @@ class SessionSecurityTest extends TestCase
     public function test_login_and_logout_work_without_exposing_privileges(): void
     {
         $user = User::factory()->create();
-        $this->get('/login')->assertOk()->assertSee('Merlin Nova');
+        $this->get('/login')->assertOk()->assertSee('Merlin Nova')->assertSee('Kostenlos registrieren')->assertSee(route('register'))->assertDontSee('Die öffentliche Registrierung folgt.');
         $this->post('/login', ['email' => $user->email, 'password' => 'password'])->assertRedirect('/app');
         $this->assertAuthenticatedAs($user);
         $this->get('/app')->assertOk()->assertSee('noch kein Partner');

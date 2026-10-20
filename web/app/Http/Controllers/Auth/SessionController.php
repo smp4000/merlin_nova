@@ -46,6 +46,8 @@ class SessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        // Nur ein fest benanntes Ziel erlauben, keine vom Request vorgegebene URL.
+        // Der Kontowechsel erfolgt erst nach ausdrücklichem CSRF-geschütztem POST.
+        return redirect()->route($request->input('next') === 'register' ? 'register' : 'login');
     }
 }
